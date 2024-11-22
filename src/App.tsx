@@ -3,9 +3,10 @@ import axios from 'axios';
 import { Container, Grid, Alert } from '@mui/material';
 import { Movie, MovieDetail, SearchResponse } from './types';
 import SearchBar from './components/SearchBar';
+import MovieList from './components/MovieList';
 
 const App: React.FC = () => {
-   // State management for search functionality
+  // State management for search functionality
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState<Movie[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<MovieDetail | null>(null);
@@ -27,13 +28,13 @@ const App: React.FC = () => {
       setTotalResults(0);
       return;
     }
-    
+
     // Set loading state and clear previous errors
     setLoading(true);
     setError(null);
 
     try {
-       // API URL with optional filters
+      // API URL with optional filters
       let url = `https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(query)}&page=${page}`;
 
       // Add optional type and year filters
@@ -44,7 +45,7 @@ const App: React.FC = () => {
         url += `&y=${year}`;
       }
 
-       // Fetch movies from OMDb API
+      // Fetch movies from OMDb API
       const response = await axios.get<SearchResponse>(url);
 
       // Handle successful response
@@ -55,16 +56,16 @@ const App: React.FC = () => {
         } else {
           setMovies(prevMovies => [...prevMovies, ...response.data.Search]);
         }
-         // Update total results count
+        // Update total results count
         setTotalResults(parseInt(response.data.totalResults));
       } else {
-         // Handle no results scenario
+        // Handle no results scenario
         setError(response.data.Error || 'No results found');
         setMovies([]);
         setTotalResults(0);
       }
     } catch (error) {
-       // Handle network or unexpected errors
+      // Handle network or unexpected errors
       setError(error instanceof Error ? error.message : 'An error occurred while searching');
       setMovies([]);
       setTotalResults(0);
@@ -74,13 +75,29 @@ const App: React.FC = () => {
     }
   };
 
+  // Handle movie selection to fetch more details
+  const handleSelectMovie = (movie: Movie) => {
+    setSelectedMovie(null); // Reset selected movie
+  };
+
   // Search handler to reset state and trigger search
   const onSearch = () => {
-   
     setCurrentPage(1);
     setSelectedMovie(null);
     searchMovies(1);
   };
+
+  // Load more results for pagination
+  const loadMore = () => {
+    if (!loading && movies.length < totalResults) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      searchMovies(nextPage);
+    }
+  };
+
+  // Constant to determine if there are more results to load
+  const hasMore = movies.length < totalResults;
 
   return (
     <Container>
@@ -94,6 +111,21 @@ const App: React.FC = () => {
         setYear={setYear}
         type={type}
         setType={setType}
+      />
+      {/* Display error message if there is an error */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+ {    /* MovieList component */}
+      <MovieList
+        movies={movies}
+        onSelectMovie={handleSelectMovie}
+        totalResults={totalResults}
+        onLoadMore={loadMore}
+        hasMore={hasMore}
+        loading={loading}
       />
     </Container>
   );
