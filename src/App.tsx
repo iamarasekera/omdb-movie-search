@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Grid, Alert } from '@mui/material';
+import { Container, Dialog, Grid, Alert, IconButton } from '@mui/material';
 import { Movie, MovieDetail, SearchResponse } from './types';
+import { Close as CloseIcon } from '@mui/icons-material';
 import SearchBar from './components/SearchBar';
 import MovieList from './components/MovieList';
 import MovieDetails from './components/MovieDetails';
@@ -19,6 +20,15 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  // State management for dialog
+  const [watchlistOpen, setWatchlistOpen] = useState(false);
+
+  // Effect to show dialog when watchlist updates
+  useEffect(() => {
+    if (watchlist.length > 0) {
+      setWatchlistOpen(true);
+    }
+  }, [watchlist]);
 
   // Retrieve API key from environment variables
   const API_KEY = process.env.REACT_APP_OMDB_API_KEY;
@@ -127,7 +137,7 @@ const App: React.FC = () => {
       const isAlreadyInWatchlist = prevWatchlist.some(
         item => item.imdbID === movie.imdbID
       );
-// Check if the movie is already in the watchlist by comparing IMDb IDs
+      // Check if the movie is already in the watchlist by comparing IMDb IDs
       if (isAlreadyInWatchlist) {
         // Remove from watchlist if already present
         return prevWatchlist.filter(item => item.imdbID !== movie.imdbID);
@@ -136,6 +146,12 @@ const App: React.FC = () => {
         return [...prevWatchlist, movie];
       }
     });
+  };
+
+  // Function to handle closing of the watchlist
+  const handleCloseWatchlist = () => {
+    // Set the watchlist state to false when watchlist UI closes
+    setWatchlistOpen(false);
   };
 
   // Constant to determine if there are more results to load
@@ -171,9 +187,8 @@ const App: React.FC = () => {
             hasMore={hasMore}
             loading={loading}
           />
-           {    /* WatchList component */}
-           <WatchList watchlist={watchlist} />
-        {    /* MovieDetails component */}
+
+          {    /* MovieDetails component */}
         </Grid>
         <Grid item xs={8}>
           <MovieDetails
@@ -183,6 +198,32 @@ const App: React.FC = () => {
           />
         </Grid>
       </Grid>
+      {/* Watchlist Dialog */}
+      <Dialog
+        open={watchlistOpen}
+        onClose={handleCloseWatchlist}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            position: 'relative',
+            p: 2
+          }
+        }}
+      >
+        <IconButton
+          onClick={handleCloseWatchlist}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: 'grey.500'
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <WatchList watchlist={watchlist} />
+      </Dialog>
     </Container>
   );
 };
