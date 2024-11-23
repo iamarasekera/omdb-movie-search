@@ -5,13 +5,14 @@ import { Movie, MovieDetail, SearchResponse } from './types';
 import SearchBar from './components/SearchBar';
 import MovieList from './components/MovieList';
 import MovieDetails from './components/MovieDetails';
-
+import WatchList from './components/WatchList';
 
 const App: React.FC = () => {
   // State management for search functionality
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState<Movie[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<MovieDetail | null>(null);
+  const [watchlist, setWatchlist] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [year, setYear] = useState<string>('');
   const [type, setType] = useState<'movie' | 'series' | 'episode' | ''>('');
@@ -117,7 +118,11 @@ const App: React.FC = () => {
 
   // Adds the selected movie to the watchlist 
   const addToWatchlist = (movie: Movie) => {
-    //TODO : Logic to add movies to the watchlist
+    // Check if the movie is already in the watchlist by comparing IMDb IDs
+    if (!watchlist.some((item) => item.imdbID === movie.imdbID)) {
+      // Add the movie to the watchlist by updating the state
+      setWatchlist([...watchlist, movie]);
+    }
   };
 
   // Constant to determine if there are more results to load
@@ -153,6 +158,8 @@ const App: React.FC = () => {
             hasMore={hasMore}
             loading={loading}
           />
+           {    /* WatchList component */}
+           <WatchList watchlist={watchlist} />
         {    /* MovieDetails component */}
         </Grid>
         <Grid item xs={8}>
