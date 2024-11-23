@@ -116,13 +116,26 @@ const App: React.FC = () => {
     }
   };
 
+  // Function to check if a movie is in the watchlist
+  const isInWatchlist = (movieId: string): boolean => {
+    return watchlist.some(movie => movie.imdbID === movieId);
+  };
+
   // Adds the selected movie to the watchlist 
-  const addToWatchlist = (movie: Movie) => {
-    // Check if the movie is already in the watchlist by comparing IMDb IDs
-    if (!watchlist.some((item) => item.imdbID === movie.imdbID)) {
-      // Add the movie to the watchlist by updating the state
-      setWatchlist([...watchlist, movie]);
-    }
+  const addToWatchlist = (movie: MovieDetail) => {
+    setWatchlist(prevWatchlist => {
+      const isAlreadyInWatchlist = prevWatchlist.some(
+        item => item.imdbID === movie.imdbID
+      );
+
+      if (isAlreadyInWatchlist) {
+        // Remove from watchlist if already present
+        return prevWatchlist.filter(item => item.imdbID !== movie.imdbID);
+      } else {
+        // Add to watchlist if not present
+        return [...prevWatchlist, movie];
+      }
+    });
   };
 
   // Constant to determine if there are more results to load
@@ -166,6 +179,7 @@ const App: React.FC = () => {
           <MovieDetails
             movie={selectedMovie}
             addToWatchlist={addToWatchlist}
+            isInWatchlist={isInWatchlist}
           />
         </Grid>
       </Grid>

@@ -12,10 +12,11 @@ import { BookmarkBorderOutlined, BookmarkOutlined } from '@mui/icons-material';
 interface MovieDetailsProps {
   movie: MovieDetail | null;
   addToWatchlist: (movie: MovieDetail) => void;
+  isInWatchlist: (movieId: string) => boolean;
 }
 
 // Functional component for the MovieDetails
-const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist }) => {
+const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist, isInWatchlist  }) => {
   // If no movie is selected, show a message prompting the user to select one
   if (!movie) {
     return (
@@ -26,6 +27,8 @@ const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist }) => {
       </Card>
     );
   }
+const inWatchlist = isInWatchlist(movie.imdbID);
+
   return (
     <Card>
     <CardContent>
@@ -35,11 +38,11 @@ const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist }) => {
         <Box sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}>
           <Button
             variant="outlined"
-            startIcon={<BookmarkOutlined />}
+            startIcon={inWatchlist ? <BookmarkOutlined /> : <BookmarkBorderOutlined />}
             onClick={() => addToWatchlist(movie)}
             sx={{
-              color: 'text.primary',
-              borderColor: 'text.primary',
+              color: inWatchlist ? 'text.primary' : 'inherit',
+              borderColor:  inWatchlist ? 'text.primary' : 'inherit',
             }}
           >
             Watchlist
