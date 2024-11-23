@@ -12,7 +12,8 @@ import {
     ListItemAvatar,
     ListItemButton,
     Avatar,
-    Button
+    Button,
+    Divider
 } from '@mui/material';
 import { Movie } from '../types';
 
@@ -27,7 +28,7 @@ interface MovieListProps {
 }
 
 // Functional component for the MovieList
-const MovieList:FC<MovieListProps> = ({
+const MovieList: FC<MovieListProps> = ({
     movies,
     onSelectMovie,
     totalResults = 0,
@@ -43,19 +44,23 @@ const MovieList:FC<MovieListProps> = ({
         {/* Render list of movies */}
         <List>
             {movies.map((movie) => (
-                <ListItem key={movie.imdbID} disablePadding>
-                    <ListItemButton onClick={() => onSelectMovie(movie)}>
-                        {/* Movie poster avatar */}
-                        <ListItemAvatar>
-                            <Avatar src={movie.Poster} alt={movie.Title} />
-                        </ListItemAvatar>
-                        {/* Movie title and year/type details */}
-                        <ListItemText
-                            primary={movie.Title}
-                            secondary={`${movie.Year} | ${movie.Type}`}
-                        />
-                    </ListItemButton>
-                </ListItem>
+                <React.Fragment key={movie.imdbID}>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={() => onSelectMovie(movie)}>
+                            {/* Movie poster avatar */}
+                            <ListItemAvatar>
+                                <Avatar src={movie.Poster} alt={movie.Title} />
+                            </ListItemAvatar>
+                            {/* Movie title and year/type details */}
+                            <ListItemText
+                                primary={movie.Title}
+                                secondary={`${movie.Year} | ${movie.Type}`}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                    {/* Divider after each movie */}
+                    <Divider variant="fullWidth" />
+                </React.Fragment>
             ))}
         </List>
         {/* Conditional rendering of "Load More" button */}
