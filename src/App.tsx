@@ -121,13 +121,13 @@ const App: React.FC = () => {
     return watchlist.some(movie => movie.imdbID === movieId);
   };
 
-  // Adds the selected movie to the watchlist 
+  // Adds or removes the selected movie to the watchlist 
   const addToWatchlist = (movie: MovieDetail) => {
     setWatchlist(prevWatchlist => {
       const isAlreadyInWatchlist = prevWatchlist.some(
         item => item.imdbID === movie.imdbID
       );
-
+// Check if the movie is already in the watchlist by comparing IMDb IDs
       if (isAlreadyInWatchlist) {
         // Remove from watchlist if already present
         return prevWatchlist.filter(item => item.imdbID !== movie.imdbID);
