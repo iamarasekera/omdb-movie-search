@@ -22,6 +22,7 @@ export interface MovieDetail extends Movie {
     Runtime: string;    //The runtime of the movie.
     Rated: string;  //The content rating of the movie.
     imdbRating: string; //The IMDb rating of the movie.*/
+    Response: string;   //The response status from the API
 }
 
 /**
