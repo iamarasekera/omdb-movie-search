@@ -4,6 +4,8 @@ import { Container, Grid, Alert } from '@mui/material';
 import { Movie, MovieDetail, SearchResponse } from './types';
 import SearchBar from './components/SearchBar';
 import MovieList from './components/MovieList';
+import MovieDetails from './components/MovieDetails';
+
 
 const App: React.FC = () => {
   // State management for search functionality
@@ -75,9 +77,26 @@ const App: React.FC = () => {
     }
   };
 
+  // Fetch movie details from OMDB API using IMDb ID
+  const fetchMovieDetails = async (imdbID: string) => {
+    try {
+      const response = await axios.get<MovieDetail>(
+        `https://www.omdbapi.com/?apikey=${API_KEY}&i=${imdbID}&plot=full`
+      );
+      // Update state if the response is valid
+      if (response.data.Response !== 'False') {
+        setSelectedMovie(response.data);
+      }
+    } catch (error) {
+      // Log errors if the fetch fails
+      console.error('Error fetching movie details:', error);
+    }
+  };
+
+
   // Handle movie selection to fetch more details
   const handleSelectMovie = (movie: Movie) => {
-    setSelectedMovie(null); // Reset selected movie
+    fetchMovieDetails(movie.imdbID);
   };
 
   // Search handler to reset state and trigger search
@@ -94,6 +113,11 @@ const App: React.FC = () => {
       setCurrentPage(nextPage);
       searchMovies(nextPage);
     }
+  };
+
+  // Adds the selected movie to the watchlist 
+  const addToWatchlist = (movie: Movie) => {
+    //TODO : Logic to add movies to the watchlist
   };
 
   // Constant to determine if there are more results to load
@@ -118,15 +142,26 @@ const App: React.FC = () => {
           {error}
         </Alert>
       )}
- {    /* MovieList component */}
-      <MovieList
-        movies={movies}
-        onSelectMovie={handleSelectMovie}
-        totalResults={totalResults}
-        onLoadMore={loadMore}
-        hasMore={hasMore}
-        loading={loading}
-      />
+      {    /* MovieList component */}
+      <Grid container spacing={3}>
+        <Grid item xs={4}>
+          <MovieList
+            movies={movies}
+            onSelectMovie={handleSelectMovie}
+            totalResults={totalResults}
+            onLoadMore={loadMore}
+            hasMore={hasMore}
+            loading={loading}
+          />
+        {    /* MovieDetails component */}
+        </Grid>
+        <Grid item xs={8}>
+          <MovieDetails
+            movie={selectedMovie}
+            addToWatchlist={addToWatchlist}
+          />
+        </Grid>
+      </Grid>
     </Container>
   );
 };
