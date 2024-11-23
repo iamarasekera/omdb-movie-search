@@ -6,6 +6,7 @@
 import React, { FC } from 'react';
 import { Box, Typography, Button, Card, CardMedia, CardContent, Chip, Rating } from '@mui/material';
 import { MovieDetail } from '../types';
+import { BookmarkBorderOutlined, BookmarkOutlined } from '@mui/icons-material';
 
 // Define the types for the props MovieDetails component will receive
 interface MovieDetailsProps {
@@ -27,22 +28,50 @@ const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist }) => {
   }
   return (
     <Card>
-      <CardContent>
-        <Box display="flex" gap={3}>
+    <CardContent>
+      {/* Main container */}
+      <Box sx={{ position: 'relative', pt: 5 }}>
+        {/* Watchlist Button */}
+        <Box sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<BookmarkOutlined />}
+            onClick={() => addToWatchlist(movie)}
+            sx={{
+              color: 'text.primary',
+              borderColor: 'text.primary',
+            }}
+          >
+            Watchlist
+          </Button>
+        </Box>
+
+        {/* Content Container */}
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 3,
+          flexDirection: { xs: 'column', md: 'row' } // Stack on mobile, row on desktop
+        }}>
           {/* Movie Poster */}
-          <Box flex="0 0 300px">
+          <Box sx={{ 
+            flexBasis: { xs: 'auto', md: '300px' },
+            flexShrink: 0,
+            width: { xs: '100%', md: '300px' }
+          }}>
             <CardMedia
               component="img"
               height="450"
               image={movie.Poster !== 'N/A' ? movie.Poster : '/placeholder.png'}
               alt={movie.Title}
-              sx={{ objectFit: 'cover' }}
+              sx={{ objectFit: 'cover',width: '100%',borderRadius: 1}}
             />
           </Box>
+
           {/* Movie Details */}
-          <Box flex="1">
+          <Box sx={{ flex: 1 }}>
             <Typography variant="h4" gutterBottom>{movie.Title}</Typography>
-            <Box display="flex" gap={1} mb={2} flexWrap="wrap">
+
+            <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
               <Chip label={movie.Year} />
               <Chip label={movie.Rated} />
               <Chip label={movie.Runtime} />
@@ -72,19 +101,12 @@ const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist }) => {
             <Typography variant="body1" paragraph>
               <strong>Plot:</strong> {movie.Plot}
             </Typography>
-             {/* 'Add to Watchlist' Button */}
-            <Button
-              variant="contained"
-              onClick={() => addToWatchlist(movie)}
-              sx={{ mt: 2 }}
-            >
-              Add to Watchlist
-            </Button>
           </Box>
         </Box>
-      </CardContent>
-    </Card>
-  );
+      </Box>
+    </CardContent>
+  </Card>
+);
 };
 
 export default MovieDetails;
