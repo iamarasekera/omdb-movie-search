@@ -27,7 +27,7 @@ interface MovieListProps {
 }
 
 // Functional component for the MovieList
-const MovieList: React.FC<MovieListProps> = ({
+const MovieList:FC<MovieListProps> = ({
     movies,
     onSelectMovie,
     totalResults = 0,
