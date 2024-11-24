@@ -11,6 +11,14 @@ export interface Movie {
 }
 
 /**
+ * The structure of a Rating object from the API response
+ */
+export interface Rating {
+    Source: string;  // The source of the rating ("IMDB", "Rotten Tomatoes, Metacritic")
+    Value: string;   // The rating value (can include % or other formats)
+}
+
+/**
  * The structure of a MovieDetail object used in the application.
  * MovieDetail extends the basic movie structure 'Movie' by adding additional fields.
 */
@@ -21,7 +29,8 @@ export interface MovieDetail extends Movie {
     Genre: string;  //The genres of the movie.
     Runtime: string;    //The runtime of the movie.
     Rated: string;  //The content rating of the movie.
-    imdbRating: string; //The IMDb rating of the movie.*/
+    imdbRating: string; //The IMDb rating of the movie.
+    Ratings?: Rating[];  // Array of ratings from different sources
     Response: string;   //The response status from the API
 }
 

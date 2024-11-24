@@ -4,9 +4,10 @@
 */
 
 import React, { FC } from 'react';
-import { Box, Typography, Button, Card, CardMedia, CardContent, Chip, Rating } from '@mui/material';
+import { Box, Typography, Button, Card, CardMedia, CardContent, Chip } from '@mui/material';
 import { MovieDetail } from '../types';
 import { BookmarkBorderOutlined, BookmarkOutlined } from '@mui/icons-material';
+import MovieRatings from './MovieRatings';
 
 // Define the types for the props MovieDetails component will receive
 interface MovieDetailsProps {
@@ -80,17 +81,6 @@ const inWatchlist = isInWatchlist(movie.imdbID);
               <Chip label={movie.Runtime} />
               <Chip label={movie.Type} />
             </Box>
-            {/* IMDb Rating */}
-            <Box mb={2}>
-              <Rating
-                value={parseFloat(movie.imdbRating) / 2}
-                precision={0.1}
-                readOnly
-              />
-              <Typography variant="body2" color="text.secondary">
-                IMDb Rating: {movie.imdbRating}/10
-              </Typography>
-            </Box>
             {/* Movie Information (Genre, Director, Actors, Plot) */}
             <Typography variant="body1" paragraph>
               <strong>Genre:</strong> {movie.Genre}
@@ -107,6 +97,8 @@ const inWatchlist = isInWatchlist(movie.imdbID);
           </Box>
         </Box>
       </Box>
+       {/* Movie Ratings Component */}
+      <MovieRatings movie={movie} />
     </CardContent>
   </Card>
 );
