@@ -6,12 +6,14 @@ import React, { FC } from 'react';
 import {
     Box,
     TextField,
+    InputAdornment,
     Button,
     Select,
     MenuItem,
     FormControl,
     InputLabel
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search'; // Import the SearchIcon
 
 // Define the types for the props SearchBar component will receive
 interface SearchBarProps {
@@ -36,11 +38,17 @@ const SearchBar: FC<SearchBarProps> = ({
     type,
     setType
   }) => (
-    <Box display="flex" gap={2} mb={3}>
+    //Search Bar Container
+    <Box display="flex" gap={2} sx={{
+      backgroundColor: '#727272', // Set background color of the to gray
+      padding: 2,
+      borderRadius: 1, 
+      width: '100%' // To ensure it spans the full width of the container
+    }}>
      {/* Input field for searching movies */}
     <TextField
-      label="Search Movies"
-      variant="outlined"
+      placeholder="Search Movies"
+      variant="standard"       
       fullWidth
       value={query}
       onChange={(e) => setQuery(e.target.value)}
@@ -48,6 +56,32 @@ const SearchBar: FC<SearchBarProps> = ({
         if (e.key === 'Enter') {
           onSearch();
         }
+      }}
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            <SearchIcon sx={{ color: 'white' }} />
+          </InputAdornment>
+        ),
+        disableUnderline: true, // Disabled underline for borderless effect
+      }}
+      sx={{
+        input: {
+          color: 'white', // Input text color
+          padding: '20px 0', // Adjust padding for vertical centering
+        },
+        '& .MuiInputBase-root': {
+          display: 'flex',
+          alignItems: 'center', // Vertically center icon and text
+          backgroundColor: 'transparent', // Set transparent background
+        },
+        '& .MuiInputBase-input::placeholder': {
+          color: 'white', // Placeholder text color
+          opacity: 1, // Ensure full opacity
+        },
+        '& .MuiInputAdornment-root': {
+          marginTop: '0', // To prevent misalignment
+        },
       }}
     />
     {/* Input field for selecting the year */}
