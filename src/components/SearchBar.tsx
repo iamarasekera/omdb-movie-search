@@ -39,7 +39,7 @@ const SearchBar: FC<SearchBarProps> = ({
     setType
   }) => (
     //Search Bar Container
-    <Box display="flex" gap={2} sx={{
+    <Box display="flex" gap={2} mb={3} sx={{
       backgroundColor: '#727272', // Set background color of the to gray
       padding: 2,
       borderRadius: 1, 
