@@ -42,31 +42,59 @@ const YearRangeSlider: React.FC<YearRangeSliderProps> = ({
         <Box sx={{ width: '250px', px: 1 }}>
             {/* Display the label for the slider */}
             <SliderLabel>YEAR</SliderLabel>
-            {/* Display the year range slider */}
-            <Slider
-                value={[yearRange.startYear, yearRange.endYear]}
-                onChange={handleChange}
-                valueLabelDisplay="auto"
-                min={MIN_YEAR}
-                max={MAX_YEAR}
-                step={STEP}
-                sx={{
-                    color: 'white',
-                    '& .MuiSlider-thumb': {
-                        backgroundColor: 'white',
-                    },
-                    '& .MuiSlider-track': {
-                        backgroundColor: 'white',
-                    },
-                    '& .MuiSlider-rail': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                    },
-                    '& .MuiSlider-valueLabel': {
-                        backgroundColor: 'white',
-                        color: 'black',
-                    }
-                }}
-            />
+            <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 2,
+            }}>
+                {/* Start year label */}
+                <Typography 
+                    sx={{ 
+                        color: 'white',
+                        fontSize: '0.75rem',
+                        minWidth: '32px'
+                    }}
+                >
+                    {MIN_YEAR}
+                </Typography>
+                
+                {/* Display the year range slider */}
+                <Slider
+                    value={[yearRange.startYear, yearRange.endYear]}
+                    onChange={handleChange}
+                    valueLabelDisplay="auto"
+                    min={MIN_YEAR}
+                    max={MAX_YEAR}
+                    step={STEP}
+                    sx={{
+                        color: 'white',
+                        '& .MuiSlider-thumb': {
+                            backgroundColor: 'white',
+                        },
+                        '& .MuiSlider-track': {
+                            backgroundColor: 'white',
+                        },
+                        '& .MuiSlider-rail': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                        },
+                        '& .MuiSlider-valueLabel': {
+                            backgroundColor: 'white',
+                            color: 'black',
+                        }
+                    }}
+                />
+                
+                {/* End year label */}
+                <Typography 
+                    sx={{ 
+                        color: 'white',
+                        fontSize: '0.75rem',
+                        minWidth: '32px'
+                    }}
+                >
+                    {MAX_YEAR}
+                </Typography>
+            </Box>
         </Box>
     );
 };
