@@ -2,7 +2,7 @@
  * MovieList Component
  * This component renders a list of movies with infinite scroll functionality.
 */
-import React, { FC, useRef, useEffect } from 'react';
+import React, { FC, useRef, useEffect, useState, KeyboardEvent } from 'react';
 import {
     Box,
     Typography,
@@ -39,6 +39,9 @@ const MovieList: FC<MovieListProps> = ({
     // Create refs for intersection observer
     const observerRef = useRef<IntersectionObserver>();
     const loadingRef = useRef<HTMLDivElement>(null);
+    
+    // Add state to track selected movie
+    const [selectedMovieId, setSelectedMovieId] = useState<string>('');
 
     useEffect(() => {
         // Create intersection observer
@@ -64,6 +67,19 @@ const MovieList: FC<MovieListProps> = ({
             }
         };
     }, [hasMore, loading, onLoadMore]);
+
+    // Handle movie selection
+    const handleMovieSelect = (movie: Movie) => {
+        setSelectedMovieId(movie.imdbID);
+        onSelectMovie(movie);
+    };
+
+    // Handle keyboard events
+    const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>, movie: Movie) => {
+        if (event.key === 'Enter') {
+            handleMovieSelect(movie);
+        }
+    };
 
     return (
         <Box
@@ -94,7 +110,17 @@ const MovieList: FC<MovieListProps> = ({
                 {movies.map((movie) => (
                     <React.Fragment key={movie.imdbID}>
                         <ListItem disablePadding>
-                            <ListItemButton onClick={() => onSelectMovie(movie)}>
+                            <ListItemButton 
+                                onClick={() => handleMovieSelect(movie)}
+                                onKeyPress={(e) => handleKeyPress(e, movie)}
+                                tabIndex={0}
+                                sx={{
+                                    backgroundColor: selectedMovieId === movie.imdbID ? '#00000033' : 'transparent',
+                                    '&:hover': {
+                                        backgroundColor: selectedMovieId === movie.imdbID ? '#00000033' : 'transparent',
+                                    }
+                                }}
+                            >
                                 {/* Movie poster avatar */}
                                 <ListItemAvatar>
                                     <Avatar src={movie.Poster} alt={movie.Title} />
