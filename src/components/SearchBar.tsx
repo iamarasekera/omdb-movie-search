@@ -16,6 +16,8 @@ import {
   FormLabel
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search'; // Import the SearchIcon
+import YearRangeSlider from './YearRangeSlide';
+import { YearRange } from '../types';
 
 // Define the types for the props SearchBar component will receive
 interface SearchBarProps {
@@ -23,8 +25,8 @@ interface SearchBarProps {
   setQuery: (query: string) => void;
   onSearch: () => void;
   loading: boolean;
-  year: string;
-  setYear: (year: string) => void;
+  yearRange: YearRange;
+  setYearRange: (range: YearRange) => void;
   type: 'movie' | 'series' | 'episode' | '';
   setType: (type: 'movie' | 'series' | 'episode' | '') => void;
 }
@@ -35,21 +37,21 @@ const SearchBar: FC<SearchBarProps> = ({
   setQuery,
   onSearch,
   loading,
-  year,
-  setYear,
+  yearRange,
+  setYearRange,
   type,
   setType
 }) => {
   /**
    * Effect hook to trigger search when filters change
-   * This automatically updates results when type or year changes (on option buttons)
+   * This automatically updates results when type or year range changes
    */
   useEffect(() => {
-    // Only trigger search if there's a query or year input
-    if (query.trim() || year.trim()) {
+    //Only Triggers the search if the query is not empty
+    if (query.trim()) {
       onSearch();
     }
-  }, [type, year]); // Dependencies: type and year filters 
+  }, [type, yearRange]); // Dependencies: type and year range filters 
 
   /**
    * Handler for type filter changes
@@ -113,19 +115,10 @@ const SearchBar: FC<SearchBarProps> = ({
           />
         </Box>
 
-        {/* Input field for selecting the year */}
-        <TextField
-          label="Year"
-          variant="outlined"
-          size="small"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          sx={{
-            width: 100,
-            '& .MuiOutlinedInput-root': {
-              backgroundColor: 'white',
-            }
-          }}
+        {/* Year Range Slider */}
+        <YearRangeSlider
+          yearRange={yearRange}
+          onYearRangeChange={setYearRange}
         />
 
         {/* Radion Button Group for type selection */}

@@ -19,6 +19,14 @@ export interface Rating {
 }
 
 /**
+ * The structure of a YearRange object for filtering movies
+ */
+export interface YearRange {
+    startYear: number;  // The start year for filtering
+    endYear: number;    // The end year for filtering
+}
+
+/**
  * The structure of a MovieDetail object used in the application.
  * MovieDetail extends the basic movie structure 'Movie' by adding additional fields.
 */

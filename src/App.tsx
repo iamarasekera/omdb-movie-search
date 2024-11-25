@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Dialog, Grid, Alert, IconButton } from '@mui/material';
-import { Movie, MovieDetail, SearchResponse } from './types';
+import { Movie, MovieDetail, SearchResponse, YearRange } from './types';
 import { Close as CloseIcon } from '@mui/icons-material';
 import SearchBar from './components/SearchBar';
 import MovieList from './components/MovieList';
@@ -15,7 +15,7 @@ const App: React.FC = () => {
   const [selectedMovie, setSelectedMovie] = useState<MovieDetail | null>(null);
   const [watchlist, setWatchlist] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
-  const [year, setYear] = useState<string>('');
+  const [yearRange, setYearRange] = useState<YearRange>({ startYear: 1970, endYear: 2024 });
   const [type, setType] = useState<'movie' | 'series' | 'episode' | ''>('');
   const [error, setError] = useState<string | null>(null);
   const [totalResults, setTotalResults] = useState(0);
@@ -32,6 +32,17 @@ const App: React.FC = () => {
 
   // Retrieve API key from environment variables
   const API_KEY = process.env.REACT_APP_OMDB_API_KEY;
+
+  //Funtion to filter movies based on the year range
+  const filterMoviesByYearRange = (movies: Movie[]): Movie[] => {
+    return movies.filter(movie => {
+      // Handle movies with year ranges (e.g., "2020-2022")
+      const movieYear = parseInt(movie.Year.split('–')[0]);
+      return !isNaN(movieYear) &&
+        movieYear >= yearRange.startYear &&
+        movieYear <= yearRange.endYear;
+    });
+  };
 
   // Async function to search movies via OMDb API
   const searchMovies = async (page: number = 1) => {
@@ -50,12 +61,9 @@ const App: React.FC = () => {
       // API URL with optional filters
       let url = `https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(query)}&page=${page}`;
 
-      // Add optional type and year filters
+      // Add optional type filter
       if (type) {
         url += `&type=${type}`;
-      }
-      if (year) {
-        url += `&y=${year}`;
       }
 
       // Fetch movies from OMDb API
@@ -63,14 +71,23 @@ const App: React.FC = () => {
 
       // Handle successful response
       if (response.data.Response === 'True') {
-        // Append results for pagination (set initial results)
+        // Filter movies by year range
+        const filteredMovies = filterMoviesByYearRange(response.data.Search);
+
+        // Update movies state based on page
         if (page === 1) {
-          setMovies(response.data.Search);
+          setMovies(filteredMovies);
         } else {
-          setMovies(prevMovies => [...prevMovies, ...response.data.Search]);
+          setMovies(prevMovies => [...prevMovies, ...filteredMovies]);
         }
-        // Update total results count
+
+         // Update total results count
         setTotalResults(parseInt(response.data.totalResults));
+
+        // If no movies match the year range, show appropriate message
+        if (filteredMovies.length === 0) {
+          setError(`No movies found between ${yearRange.startYear} and ${yearRange.endYear}`);
+        }
       } else {
         // Handle no results scenario
         setError(response.data.Error || 'No results found');
@@ -159,18 +176,18 @@ const App: React.FC = () => {
 
   return (
     <Container>
-      {/* SearchBar component */}
+       {/* SearchBar component */}
       <SearchBar
         query={query}
         setQuery={setQuery}
         onSearch={onSearch}
         loading={loading}
-        year={year}
-        setYear={setYear}
+        yearRange={yearRange}
+        setYearRange={setYearRange}
         type={type}
         setType={setType}
       />
-      {/* Display error message if there is an error */}
+{/* Display error message if there is an error */}
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -187,7 +204,7 @@ const App: React.FC = () => {
             hasMore={hasMore}
             loading={loading}
           />
-
+          
           {    /* MovieDetails component */}
         </Grid>
         <Grid item xs={8}>
@@ -198,7 +215,7 @@ const App: React.FC = () => {
           />
         </Grid>
       </Grid>
-      {/* Watchlist Dialog */}
+{/* Watchlist Dialog */}
       <Dialog
         open={watchlistOpen}
         onClose={handleCloseWatchlist}
