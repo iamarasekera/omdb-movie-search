@@ -13,7 +13,8 @@ import {
   Typography,
   FormControl,
   Stack,
-  FormLabel
+  FormLabel,
+  IconButton
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search'; // Import the SearchIcon
 import YearRangeSlider from './YearRangeSlide';
@@ -61,6 +62,16 @@ const SearchBar: FC<SearchBarProps> = ({
     setType(newType);
   };
 
+  /**
+   * Handler for search execution
+   * Prevents search when loading or query is empty
+   */
+  const handleSearch = () => {
+    if (!loading && query.trim()) {
+      onSearch();
+    }
+  };
+
   return (
     <Stack spacing={1}>
       {/* Main Search Container */}
@@ -82,14 +93,27 @@ const SearchBar: FC<SearchBarProps> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyPress={(e) => {
-              if (e.key === 'Enter' && !loading) {
-                onSearch();
+              if (e.key === 'Enter') {
+                // Execute search on enter button
+                handleSearch();
               }
             }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ color: 'white' }} />
+                  <IconButton 
+                    onClick={handleSearch} //Execute search onclick of search icon
+                    disabled={loading}
+                    size="small"
+                    sx={{ 
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                      }
+                    }}
+                  >
+                    <SearchIcon />
+                  </IconButton>
                 </InputAdornment>
               ),
               disableUnderline: true, // Disabled underline for borderless effect
