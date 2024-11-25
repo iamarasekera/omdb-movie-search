@@ -1,8 +1,8 @@
 /**
  * MovieList Component
- * This component renders a list of movies.
+ * This component renders a list of movies with infinite scroll functionality.
 */
-import React, { FC } from 'react';
+import React, { FC, useRef, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -12,8 +12,8 @@ import {
     ListItemAvatar,
     ListItemButton,
     Avatar,
-    Button,
-    Divider
+    Divider,
+    CircularProgress
 } from '@mui/material';
 import { Movie } from '../types';
 
@@ -35,43 +35,95 @@ const MovieList: FC<MovieListProps> = ({
     onLoadMore,
     hasMore = false,
     loading = false
-}) => (
-    <Box>
-        {/* Display total number of results */}
-        <Typography variant="h6" gutterBottom>
-            {totalResults ? `${totalResults} Results` : `${movies.length} Results`}
-        </Typography>
-        {/* Render list of movies */}
-        <List>
-            {movies.map((movie) => (
-                <React.Fragment key={movie.imdbID}>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={() => onSelectMovie(movie)}>
-                            {/* Movie poster avatar */}
-                            <ListItemAvatar>
-                                <Avatar src={movie.Poster} alt={movie.Title} />
-                            </ListItemAvatar>
-                            {/* Movie title and year/type details */}
-                            <ListItemText
-                                primary={movie.Title}
-                                secondary={`${movie.Year} | ${movie.Type}`}
-                            />
-                        </ListItemButton>
-                    </ListItem>
-                    {/* Divider after each movie */}
-                    <Divider variant="fullWidth" />
-                </React.Fragment>
-            ))}
-        </List>
-        {/* Conditional rendering of "Load More" button */}
-        {hasMore && !loading && (
-            <Box display="flex" justifyContent="center" mt={2}>
-                <Button onClick={onLoadMore} variant="outlined">
-                    Load More
-                </Button>
+}) => {
+    // Create refs for intersection observer
+    const observerRef = useRef<IntersectionObserver>();
+    const loadingRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        // Create intersection observer
+        observerRef.current = new IntersectionObserver(
+            (entries) => {
+                // Check if the loading element is visible and there are more items to load
+                if (entries[0].isIntersecting && hasMore && !loading) {
+                    onLoadMore?.();
+                }
+            },
+            { threshold: 0.5 }
+        );
+
+        // Observe the loading element
+        if (loadingRef.current) {
+            observerRef.current.observe(loadingRef.current);
+        }
+
+        // Cleanup observer on unmount
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+        };
+    }, [hasMore, loading, onLoadMore]);
+
+    return (
+        <Box
+            sx={{
+                height: '80vh',
+                overflow: 'auto',
+                '&::-webkit-scrollbar': {
+                    width: '8px',
+                },
+                '&::-webkit-scrollbar-track': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                    borderRadius: '4px',
+                    '&:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                    },
+                },
+            }}
+        >
+            {/* Display total number of results */}
+            <Typography variant="h6" gutterBottom>
+                {totalResults ? `${totalResults} Results` : `${movies.length} Results`}
+            </Typography>
+            {/* Render list of movies */}
+            <List>
+                {movies.map((movie) => (
+                    <React.Fragment key={movie.imdbID}>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={() => onSelectMovie(movie)}>
+                                {/* Movie poster avatar */}
+                                <ListItemAvatar>
+                                    <Avatar src={movie.Poster} alt={movie.Title} />
+                                </ListItemAvatar>
+                                {/* Movie title and year/type details */}
+                                <ListItemText
+                                    primary={movie.Title}
+                                    secondary={`${movie.Year} | ${movie.Type}`}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                        {/* Divider after each movie */}
+                        <Divider variant="fullWidth" />
+                    </React.Fragment>
+                ))}
+            </List>
+            {/* Loading indicator that triggers infinite scroll */}
+            <Box
+                ref={loadingRef}
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    py: 2
+                }}
+            >
+                {loading && <CircularProgress size={24} />}
             </Box>
-        )}
-    </Box>
-);
+        </Box>
+    );
+};
 
 export default MovieList;
