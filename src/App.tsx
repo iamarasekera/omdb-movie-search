@@ -33,15 +33,41 @@ const App: React.FC = () => {
   // Retrieve API key from environment variables
   const API_KEY = process.env.REACT_APP_OMDB_API_KEY;
 
-  //Funtion to filter movies based on the year range
-  const filterMoviesByYearRange = (movies: Movie[]): Movie[] => {
-    return movies.filter(movie => {
-      // Handle movies with year ranges (e.g., "2020-2022")
-      const movieYear = parseInt(movie.Year.split('–')[0]);
+  // Function to filter movies based on the year range and update total results accordingly
+  const filterMoviesByYearRange = (movies: Movie[], allResults: number): { filteredMovies: Movie[], filteredTotal: number } => {
+    const filteredMovies = movies.filter(movie => {
+      // Handle movies with year ranges (eg: 2020-2022)
+      const yearParts = movie.Year.split('–');
+      const movieYear = parseInt(yearParts[0]);
+
+      // If it's a series with a range, check if any part of the range overlaps with selected range
+      if (yearParts.length > 1) {
+        const endYear = parseInt(yearParts[1]) || new Date().getFullYear();
+        return (
+          // Ensure both start and end years are valid numbers
+          !isNaN(movieYear) &&
+          !isNaN(endYear) &&
+          // Check if the movie year or the end year of the series overlaps with the selected range
+          ((movieYear >= yearRange.startYear && movieYear <= yearRange.endYear) ||
+            (endYear >= yearRange.startYear && endYear <= yearRange.endYear))
+        );
+      }
+      // For movies without a year range, check if the movie year falls within the selected range
       return !isNaN(movieYear) &&
         movieYear >= yearRange.startYear &&
         movieYear <= yearRange.endYear;
     });
+
+    // The percentage of current results that match the year filter
+    const filterRatio = movies.length > 0 ? filteredMovies.length / movies.length : 0;
+
+    // Estimate total results based on the filter ratio (but never less than actual filtered movies)
+    const estimatedTotal = Math.max(filteredMovies.length, Math.floor(allResults * filterRatio));
+
+    return {
+      filteredMovies,
+      filteredTotal: estimatedTotal
+    };
   };
 
   // Async function to search movies via OMDb API
@@ -71,8 +97,13 @@ const App: React.FC = () => {
 
       // Handle successful response
       if (response.data.Response === 'True') {
-        // Filter movies by year range
-        const filteredMovies = filterMoviesByYearRange(response.data.Search);
+        const totalApiResults = parseInt(response.data.totalResults);
+
+        // Filter movies by year range and get updated total
+        const { filteredMovies, filteredTotal } = filterMoviesByYearRange(
+          response.data.Search,
+          totalApiResults
+        );
 
         // Update movies state based on page
         if (page === 1) {
@@ -81,12 +112,14 @@ const App: React.FC = () => {
           setMovies(prevMovies => [...prevMovies, ...filteredMovies]);
         }
 
-         // Update total results count
-        setTotalResults(parseInt(response.data.totalResults));
+        // Update total results with filtered count
+        setTotalResults(filteredTotal);
 
-        // If no movies match the year range, show appropriate message
-        if (filteredMovies.length === 0) {
+        // Display error only if no movies match the filter AND user is on the first page
+        if (filteredMovies.length === 0 && page === 1) {
           setError(`No movies found between ${yearRange.startYear} and ${yearRange.endYear}`);
+        } else {
+          setError(null);
         }
       } else {
         // Handle no results scenario
@@ -105,7 +138,22 @@ const App: React.FC = () => {
     }
   };
 
-  // Fetch movie details from OMDB API using IMDb ID
+  // Effect to handle year range changes
+  useEffect(() => {
+    if (movies.length > 0) {
+      const { filteredMovies, filteredTotal } = filterMoviesByYearRange(movies, totalResults);
+      setMovies(filteredMovies);
+      setTotalResults(filteredTotal);
+
+      // Display error only if no movies match the filter
+      if (filteredMovies.length === 0) {
+        setError(`No movies found between ${yearRange.startYear} and ${yearRange.endYear}`);
+      } else {
+        setError(null);
+      }
+    }
+  }, [yearRange]);
+
   const fetchMovieDetails = async (imdbID: string) => {
     try {
       const response = await axios.get<MovieDetail>(
@@ -176,7 +224,7 @@ const App: React.FC = () => {
 
   return (
     <Container>
-       {/* SearchBar component */}
+      {/* SearchBar component */}
       <SearchBar
         query={query}
         setQuery={setQuery}
@@ -187,7 +235,7 @@ const App: React.FC = () => {
         type={type}
         setType={setType}
       />
-{/* Display error message if there is an error */}
+      {/* Display error message if there is an error */}
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -204,7 +252,7 @@ const App: React.FC = () => {
             hasMore={hasMore}
             loading={loading}
           />
-          
+
           {    /* MovieDetails component */}
         </Grid>
         <Grid item xs={8}>
@@ -215,7 +263,7 @@ const App: React.FC = () => {
           />
         </Grid>
       </Grid>
-{/* Watchlist Dialog */}
+      {/* Watchlist Dialog */}
       <Dialog
         open={watchlistOpen}
         onClose={handleCloseWatchlist}
