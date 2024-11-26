@@ -1,4 +1,4 @@
-# OMDB Movie Search React App (public/hms-cover.png)
+![OMDB Movie Search React App ](public/omdb-movie-search-cover.png)
 
 This is a React application that allows users to search for movies, series, and episodes from the OMDb API, view detailed information, and add them to a watchlist. The app includes features like year range filtering and type filtering for more specific search results.
 
