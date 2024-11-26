@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Dialog, Grid, Alert, IconButton } from '@mui/material';
-import { Movie, MovieDetail, SearchResponse, YearRange } from './types';
 import { Close as CloseIcon } from '@mui/icons-material';
+
+import { fetchMovies, fetchMovieDetails } from '../src/api/movieApi';
+import { Movie, MovieDetail, YearRange } from './types';
+
 import SearchBar from './components/SearchBar';
 import MovieList from './components/MovieList';
 import MovieDetails from './components/MovieDetails';
@@ -23,9 +25,6 @@ const App: React.FC = () => {
   // State management for dialog
   const [watchlistOpen, setWatchlistOpen] = useState(false);
 
-  // Memoize API key retrieval
-  const API_KEY = useMemo(() => process.env.REACT_APP_OMDB_API_KEY, []);
-
   // Memoized year range filtering function
   const filterMoviesByYearRange = useCallback((movies: Movie[], allResults: number) => {
     const filteredMovies = movies.filter(movie => {
@@ -37,12 +36,11 @@ const App: React.FC = () => {
       if (yearParts.length > 1) {
         const endYear = parseInt(yearParts[1]) || new Date().getFullYear();
         return (
+          !isNaN(movieYear) && !isNaN(endYear) &&
           // Ensure both start and end years are valid numbers
-          !isNaN(movieYear) &&
-          !isNaN(endYear) &&
-          // Check if the movie year or the end year of the series overlaps with the selected range
+           // Check if the movie year or the end year of the series overlaps with the selected range
           ((movieYear >= yearRange.startYear && movieYear <= yearRange.endYear) ||
-            (endYear >= yearRange.startYear && endYear <= yearRange.endYear))
+           (endYear >= yearRange.startYear && endYear <= yearRange.endYear))
         );
       }
       // For movies without a year range, check if the movie year falls within the selected range
@@ -57,10 +55,7 @@ const App: React.FC = () => {
     // Estimate total results based on the filter ratio (but never less than actual filtered movies)
     const estimatedTotal = Math.max(filteredMovies.length, Math.floor(allResults * filterRatio));
 
-    return {
-      filteredMovies,
-      filteredTotal: estimatedTotal
-    };
+    return { filteredMovies, filteredTotal: estimatedTotal };
   }, [yearRange]);
 
   // Async (Memoized) function to search movies via OMDb API 
@@ -77,24 +72,12 @@ const App: React.FC = () => {
     setError(null);
 
     try {
-      // API URL with optional filters
-      let url = `https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(query)}&page=${page}`;
+      const response = await fetchMovies(query, page, type);
 
-      // Add optional type filter
-      if (type) {
-        url += `&type=${type}`;
-      }
-
-      // Fetch movies from OMDb API
-      const response = await axios.get<SearchResponse>(url);
-
-      // Handle successful response
-      if (response.data.Response === 'True') {
-        const totalApiResults = parseInt(response.data.totalResults);
-
-        // Filter movies by year range and get updated total
+      if (response.Response === 'True') {
+        const totalApiResults = parseInt(response.totalResults);
         const { filteredMovies, filteredTotal } = filterMoviesByYearRange(
-          response.data.Search,
+          response.Search,
           totalApiResults
         );
 
@@ -112,8 +95,8 @@ const App: React.FC = () => {
           setError(null);
         }
       } else {
-        // Handle no results scenario
-        setError(response.data.Error || 'No results found');
+         // Handle no results scenario
+        setError(response.Error || 'No results found');
         setMovies([]);
         setTotalResults(0);
       }
@@ -126,29 +109,19 @@ const App: React.FC = () => {
       // Always stop loading
       setLoading(false);
     }
-  }, [query, type, yearRange, API_KEY, filterMoviesByYearRange]);
+  }, [query, type, yearRange, filterMoviesByYearRange]);
 
   // Function (Memoized) to fetches movie details
-  const fetchMovieDetails = useCallback(async (imdbID: string) => {
+  const handleSelectMovie = useCallback(async (movie: Movie) => {
     try {
-      const response = await axios.get<MovieDetail>(
-        `https://www.omdbapi.com/?apikey=${API_KEY}&i=${imdbID}&plot=full`
-      );
-      // Update state if the response is valid
-      if (response.data.Response !== 'False') {
-        setSelectedMovie(response.data);
-      }
+      const details = await fetchMovieDetails(movie.imdbID);
+      setSelectedMovie(details);
     } catch (error) {
-      // Log errors if the fetch fails
       console.error('Error fetching movie details:', error);
     }
-  }, [API_KEY]);
+  }, []);
 
-  // Handle movie selection to fetch more details (Memoized event handlers)
-  const handleSelectMovie = useCallback((movie: Movie) => {
-    fetchMovieDetails(movie.imdbID);
-  }, [fetchMovieDetails]);
-
+  // Search and pagination handlers
   const onSearch = useCallback(() => {
     setCurrentPage(1);
     setSelectedMovie(null);
@@ -177,9 +150,9 @@ const App: React.FC = () => {
 
       return isAlreadyInWatchlist
       // Remove from watchlist if already present 
-      ? prevWatchlist.filter(item => item.imdbID !== movie.imdbID)
+        ? prevWatchlist.filter(item => item.imdbID !== movie.imdbID)
        // Add to watchlist if not present  
-      : [...prevWatchlist, movie];
+        : [...prevWatchlist, movie];
     });
   }, []);
   // Function to handle closing of the watchlist
