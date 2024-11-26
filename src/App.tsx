@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { Container, Dialog, Grid, Alert, IconButton } from '@mui/material';
 import { Movie, MovieDetail, SearchResponse, YearRange } from './types';
@@ -23,18 +23,11 @@ const App: React.FC = () => {
   // State management for dialog
   const [watchlistOpen, setWatchlistOpen] = useState(false);
 
-  // Effect to show dialog when watchlist updates
-  useEffect(() => {
-    if (watchlist.length > 0) {
-      setWatchlistOpen(true);
-    }
-  }, [watchlist]);
+  // Memoize API key retrieval
+  const API_KEY = useMemo(() => process.env.REACT_APP_OMDB_API_KEY, []);
 
-  // Retrieve API key from environment variables
-  const API_KEY = process.env.REACT_APP_OMDB_API_KEY;
-
-  // Function to filter movies based on the year range and update total results accordingly
-  const filterMoviesByYearRange = (movies: Movie[], allResults: number): { filteredMovies: Movie[], filteredTotal: number } => {
+  // Memoized year range filtering function
+  const filterMoviesByYearRange = useCallback((movies: Movie[], allResults: number) => {
     const filteredMovies = movies.filter(movie => {
       // Handle movies with year ranges (eg: 2020-2022)
       const yearParts = movie.Year.split('–');
@@ -68,10 +61,10 @@ const App: React.FC = () => {
       filteredMovies,
       filteredTotal: estimatedTotal
     };
-  };
+  }, [yearRange]);
 
-  // Async function to search movies via OMDb API
-  const searchMovies = async (page: number = 1) => {
+  // Async (Memoized) function to search movies via OMDb API 
+  const searchMovies = useCallback(async (page: number = 1) => {
     if (!query.trim()) {
       setMovies([]);
       setError(null);
@@ -106,13 +99,10 @@ const App: React.FC = () => {
         );
 
         // Update movies state based on page
-        if (page === 1) {
-          setMovies(filteredMovies);
-        } else {
-          setMovies(prevMovies => [...prevMovies, ...filteredMovies]);
-        }
-
-        // Update total results with filtered count
+        setMovies(prevMovies =>
+          page === 1 ? filteredMovies : [...prevMovies, ...filteredMovies]
+        );
+  // Update total results with filtered count
         setTotalResults(filteredTotal);
 
         // Display error only if no movies match the filter AND user is on the first page
@@ -136,25 +126,10 @@ const App: React.FC = () => {
       // Always stop loading
       setLoading(false);
     }
-  };
+  }, [query, type, yearRange, API_KEY, filterMoviesByYearRange]);
 
-  // Effect to handle year range changes
-  useEffect(() => {
-    if (movies.length > 0) {
-      const { filteredMovies, filteredTotal } = filterMoviesByYearRange(movies, totalResults);
-      setMovies(filteredMovies);
-      setTotalResults(filteredTotal);
-
-      // Display error only if no movies match the filter
-      if (filteredMovies.length === 0) {
-        setError(`No movies found between ${yearRange.startYear} and ${yearRange.endYear}`);
-      } else {
-        setError(null);
-      }
-    }
-  }, [yearRange]);
-
-  const fetchMovieDetails = async (imdbID: string) => {
+  // Function (Memoized) to fetches movie details
+  const fetchMovieDetails = useCallback(async (imdbID: string) => {
     try {
       const response = await axios.get<MovieDetail>(
         `https://www.omdbapi.com/?apikey=${API_KEY}&i=${imdbID}&plot=full`
@@ -167,69 +142,85 @@ const App: React.FC = () => {
       // Log errors if the fetch fails
       console.error('Error fetching movie details:', error);
     }
-  };
+  }, [API_KEY]);
 
-
-  // Handle movie selection to fetch more details
-  const handleSelectMovie = (movie: Movie) => {
+  // Handle movie selection to fetch more details (Memoized event handlers)
+  const handleSelectMovie = useCallback((movie: Movie) => {
     fetchMovieDetails(movie.imdbID);
-  };
+  }, [fetchMovieDetails]);
 
-  // Search handler to reset state and trigger search
-  const onSearch = () => {
+  const onSearch = useCallback(() => {
     setCurrentPage(1);
     setSelectedMovie(null);
     searchMovies(1);
-  };
-
+  }, [searchMovies]);
   // Load more results for pagination
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     if (!loading && movies.length < totalResults) {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
       searchMovies(nextPage);
     }
-  };
+  }, [loading, movies.length, totalResults, currentPage, searchMovies]);
 
   // Function to check if a movie is in the watchlist
-  const isInWatchlist = (movieId: string): boolean => {
+  const isInWatchlist = useCallback((movieId: string): boolean => {
     return watchlist.some(movie => movie.imdbID === movieId);
-  };
+  }, [watchlist]);
 
   // Adds or removes the selected movie to the watchlist 
-  const addToWatchlist = (movie: MovieDetail) => {
+  const addToWatchlist = useCallback((movie: MovieDetail) => {
     setWatchlist(prevWatchlist => {
       const isAlreadyInWatchlist = prevWatchlist.some(
         item => item.imdbID === movie.imdbID
       );
-      // Check if the movie is already in the watchlist by comparing IMDb IDs
-      if (isAlreadyInWatchlist) {
-        // Remove from watchlist if already present
-        return prevWatchlist.filter(item => item.imdbID !== movie.imdbID);
-      } else {
-        // Add to watchlist if not present
-        return [...prevWatchlist, movie];
-      }
-    });
-  };
 
+      return isAlreadyInWatchlist
+      // Remove from watchlist if already present 
+      ? prevWatchlist.filter(item => item.imdbID !== movie.imdbID)
+       // Add to watchlist if not present  
+      : [...prevWatchlist, movie];
+    });
+  }, []);
   // Function to handle closing of the watchlist
-  const handleCloseWatchlist = () => {
+  const handleCloseWatchlist = useCallback(() => {
     // Set the watchlist state to false when watchlist UI closes
     setWatchlistOpen(false);
-  };
+  }, []);
 
-  // Constant to determine if there are more results to load
-  const hasMore = movies.length < totalResults;
+  // Effect to show dialog when watchlist updates
+  useEffect(() => {
+    if (watchlist.length > 0) {
+      setWatchlistOpen(true);
+    }
+  }, [watchlist]);
 
   // Effect to clear movies when query is empty
-  React.useEffect(() => {
+  useEffect(() => {
     if (query.trim() === '') {
       setMovies([]);
       setTotalResults(0);
       setSelectedMovie(null);
     }
   }, [query]);
+
+  // Effect to handle year range changes
+  useEffect(() => {
+    if (movies.length > 0) {
+      const { filteredMovies, filteredTotal } = filterMoviesByYearRange(movies, totalResults);
+      setMovies(filteredMovies);
+      setTotalResults(filteredTotal);
+
+      if (filteredMovies.length === 0) {
+        setError(`No movies found between ${yearRange.startYear} and ${yearRange.endYear}`);
+      } else {
+        setError(null);
+      }
+    }
+  }, [yearRange, filterMoviesByYearRange, totalResults]);
+
+  // Constant to determine if there are more results to load
+  const hasMore = movies.length < totalResults;
 
   return (
     <Container>
@@ -302,4 +293,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default React.memo(App);
