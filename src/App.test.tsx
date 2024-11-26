@@ -1,3 +1,18 @@
+/**
+ * App Component Tests
+ * This test suite contains unit tests for the App component and its related components.
+ * It focuses on the core functionalities such as:
+ * - Movie search functionality.
+ * - Movie selection and detail display.
+ * - Adding a movie to the watchlist.
+ * - Filtering movies by type.
+ * - Handling scenarios with no search results.
+ * 
+ * It mocks the necessary API calls and verifies that the App reacts correctly to various user interactions.
+ * The tests are designed to ensure that the App works as expected in different scenarios, such as fetching movie data,
+ * selecting a movie, and interacting with the watchlist feature.
+ */
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -125,39 +140,39 @@ describe('App Component', () => {
       interval: 100 
     });
   });
-
-    /**
+ 
+  /**
    * Test case: Verify movie selection functionality
    * - Checks if clicking a movie triggers the selection callback
    */
-    test("selects movie and shows details", async () => {
-      // Create a mock function to simulate movie selection
-      const mockOnSelectMovie = jest.fn();
-  
-      // Predefined test movie data
-      const movies = [
-          {
-              imdbID: "1",
-              Title: "Test Movie Title",
-              Year: "2021",
-              Type: "movie",
-              Poster: "https://via.placeholder.com/150"
-          }
-      ];
-  
-      // Render MovieList with test data
-      render(<MovieList movies={movies} onSelectMovie={mockOnSelectMovie} />);
-  
-      // Find and verify movie title is rendered
-      const movieTitle = await screen.findByText(/Test Movie Title/i);
-      expect(movieTitle).toBeInTheDocument();
-  
-      // Simulate clicking the movie
-      fireEvent.click(movieTitle);
-  
-      // Verify the selection callback is called with correct movie data
-      expect(mockOnSelectMovie).toHaveBeenCalledWith(movies[0]);
-    });
+  test("selects movie and shows details", async () => {
+    // Create a mock function to simulate movie selection
+    const mockOnSelectMovie = jest.fn();
+
+    // Predefined test movie data
+    const movies = [
+        {
+            imdbID: "1",
+            Title: "Test Movie Title",
+            Year: "2021",
+            Type: "movie",
+            Poster: "https://via.placeholder.com/150"
+        }
+    ];
+
+    // Render MovieList with test data
+    render(<MovieList movies={movies} onSelectMovie={mockOnSelectMovie} />);
+
+    // Find and verify movie title is rendered
+    const movieTitle = await screen.findByText(/Test Movie Title/i);
+    expect(movieTitle).toBeInTheDocument();
+
+    // Simulate clicking the movie
+    fireEvent.click(movieTitle);
+
+    // Verify the selection callback is called with correct movie data
+    expect(mockOnSelectMovie).toHaveBeenCalledWith(movies[0]);
+  });
 
   /**
    * Test case: Verify add to watchlist functionality
@@ -187,32 +202,34 @@ describe('App Component', () => {
     // Verify addToWatchlist was called with correct movie details
     expect(mockAddToWatchlist).toHaveBeenCalledWith(mockMovieDetails);
   });
-    /**
+
+  /**
    * Test case: Verify movie type filtering
    * - Checks if selecting a movie type filters search results
    */
-    test('filters movies by type', async () => {
-      // Mock API response
-      (fetchMovies as jest.Mock).mockResolvedValue(mockSearchResponse);
-  
-      // Render App component
-      render(<App />);
-      
-      // Select 'Movies' type filter
-      const moviesRadio = screen.getByLabelText('Movies');
-      fireEvent.click(moviesRadio);
-  
-      // Perform search
-      const searchInput = screen.getByPlaceholderText('Search Movies');
-      const searchButton = screen.getByLabelText('Search movies');
-      fireEvent.change(searchInput, { target: { value: 'Test' } });
-      fireEvent.click(searchButton);
-  
-      // Verify API call includes movie type filter
-      await waitFor(() => {
-        expect(fetchMovies).toHaveBeenCalledWith('Test', 1, 'movie');
-      });
+  test('filters movies by type', async () => {
+    // Mock API response
+    (fetchMovies as jest.Mock).mockResolvedValue(mockSearchResponse);
+
+    // Render App component
+    render(<App />);
+    
+    // Select 'Movies' type filter
+    const moviesRadio = screen.getByLabelText('Movies');
+    fireEvent.click(moviesRadio);
+
+    // Perform search
+    const searchInput = screen.getByPlaceholderText('Search Movies');
+    const searchButton = screen.getByLabelText('Search movies');
+    fireEvent.change(searchInput, { target: { value: 'Test' } });
+    fireEvent.click(searchButton);
+
+    // Verify API call includes movie type filter
+    await waitFor(() => {
+      expect(fetchMovies).toHaveBeenCalledWith('Test', 1, 'movie');
     });
+  });
+
   /**
    * Test case: Verify handling of no search results
    * - Checks error handling when no movies are found
@@ -240,5 +257,4 @@ describe('App Component', () => {
       expect(errorElement).toBeInTheDocument();
     });
   });
-
 });
