@@ -111,6 +111,7 @@ const SearchBar: FC<SearchBarProps> = ({
                         backgroundColor: 'rgba(255, 255, 255, 0.1)'
                       }
                     }}
+                    aria-label="Search movies"
                   >
                     <SearchIcon />
                   </IconButton>
@@ -164,6 +165,7 @@ const SearchBar: FC<SearchBarProps> = ({
               row
               value={type}
               onChange={(e) => handleTypeChange(e.target.value as typeof type)}
+              aria-label="Filter by type"
               sx={{
                 '& .MuiFormControlLabel-root': {
                   marginRight: 3,

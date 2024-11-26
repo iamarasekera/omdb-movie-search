@@ -41,7 +41,7 @@ const YearRangeSlider: React.FC<YearRangeSliderProps> = ({
     return (
         <Box sx={{ width: '250px', px: 1 }}>
             {/* Display the label for the slider */}
-            <SliderLabel>YEAR</SliderLabel>
+            <SliderLabel id="year-range-slider-label">YEAR</SliderLabel>
             <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
@@ -66,6 +66,7 @@ const YearRangeSlider: React.FC<YearRangeSliderProps> = ({
                     min={MIN_YEAR}
                     max={MAX_YEAR}
                     step={STEP}
+                    aria-labelledby="year-range-slider-label"
                     sx={{
                         color: 'white',
                         '& .MuiSlider-thumb': {
