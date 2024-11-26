@@ -1,7 +1,7 @@
 /**
  * MovieDetails Component
  * This component displays detailed information about a specific movie.
-*/
+ */
 
 import React, { FC } from 'react';
 import { Box, Typography, Button, Card, CardMedia, CardContent, Chip } from '@mui/material';
@@ -10,15 +10,20 @@ import { BookmarkBorderOutlined, BookmarkOutlined } from '@mui/icons-material';
 import MovieRatings from './MovieRatings';
 import { MovieFilter as MovieFilterIcon } from '@mui/icons-material';
 
-// Define the types for the props MovieDetails component will receive
+/**
+ * Define the types for the props the MovieDetails component will receive.
+ */
 interface MovieDetailsProps {
   movie: MovieDetail | null;
   addToWatchlist: (movie: MovieDetail) => void;
   isInWatchlist: (movieId: string) => boolean;
 }
 
-// Functional component for the MovieDetails
-const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist, isInWatchlist  }) => {
+/**
+ * Functional component for MovieDetails.
+ * Displays the details of the selected movie or a prompt to select a movie.
+ */
+const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist, isInWatchlist }) => {
   // If no movie is selected, show a message prompting the user to select one
   if (!movie) {
     return (
@@ -36,13 +41,14 @@ const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist, isInWatchl
           >
             <MovieFilterIcon sx={{ fontSize: 100, color: 'grey.500', mb: 2 }} />
             <Typography variant="h5" color="textSecondary">
-            Select a movie to see details.
+              Select a movie to see details.
             </Typography>
           </Box>
         </CardContent>
       </Card>
     );
   }
+
   const inWatchlist = isInWatchlist(movie.imdbID);
 
   return (
@@ -58,7 +64,7 @@ const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist, isInWatchl
               onClick={() => addToWatchlist(movie)}
               sx={{
                 color: inWatchlist ? 'text.primary' : 'inherit',
-              borderColor:  inWatchlist ? 'text.primary' : 'inherit',
+                borderColor: inWatchlist ? 'text.primary' : 'inherit',
               }}
             >
               Watchlist
@@ -66,23 +72,27 @@ const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist, isInWatchl
           </Box>
 
           {/* Content Container */}
-          <Box sx={{
-            display: 'flex',
-            gap: 3,
-            flexDirection: { xs: 'column', md: 'row' } // Stack on mobile, row on desktop
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 3,
+              flexDirection: { xs: 'column', md: 'row' }, // Stack on mobile, row on desktop
+            }}
+          >
             {/* Movie Poster */}
-            <Box sx={{
-              flexBasis: { xs: 'auto', md: '300px' },
-              flexShrink: 0,
-              width: { xs: '100%', md: '300px' }
-            }}>
+            <Box
+              sx={{
+                flexBasis: { xs: 'auto', md: '300px' },
+                flexShrink: 0,
+                width: { xs: '100%', md: '300px' }
+              }}
+            >
               <CardMedia
                 component="img"
                 height="450"
                 image={movie.Poster !== 'N/A' ? movie.Poster : '/placeholder.png'}
                 alt={movie.Title}
-              sx={{ objectFit: 'cover',width: '100%',borderRadius: 1}}
+                sx={{ objectFit: 'cover', width: '100%', borderRadius: 1 }}
               />
             </Box>
 
@@ -96,6 +106,7 @@ const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist, isInWatchl
                 <Chip label={movie.Runtime} />
                 <Chip label={movie.Type} />
               </Box>
+
               {/* Movie Information (Genre, Director, Actors, Plot) */}
               <Typography variant="body1" paragraph>
                 <strong>Genre:</strong> {movie.Genre}
@@ -112,6 +123,7 @@ const MovieDetails: FC<MovieDetailsProps> = ({ movie, addToWatchlist, isInWatchl
             </Box>
           </Box>
         </Box>
+
         {/* Movie Ratings Component */}
         <MovieRatings movie={movie} />
       </CardContent>
