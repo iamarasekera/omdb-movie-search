@@ -1,7 +1,7 @@
 /**
  * SearchBar Component
- * This component provides search functionality for movies
-*/
+ * This component provides search functionality for movies, series, or episodes
+ */
 import React, { FC, useEffect, useCallback, memo } from 'react';
 import {
   Box,
@@ -16,7 +16,7 @@ import {
   FormLabel,
   IconButton
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search'; // Import the SearchIcon
+import SearchIcon from '@mui/icons-material/Search';
 import YearRangeSlider from './YearRangeSlide';
 import { YearRange } from '../types';
 
@@ -32,7 +32,6 @@ interface SearchBarProps {
   setType: (type: 'movie' | 'series' | 'episode' | '') => void;
 }
 
-// Functional component for the SearchBar
 const SearchBar: FC<SearchBarProps> = ({
   query,
   setQuery,
@@ -45,26 +44,24 @@ const SearchBar: FC<SearchBarProps> = ({
 }) => {
   /**
    * Effect hook to trigger search when filters change
-   * This automatically updates results when type or year range changes
+   * Automatically updates results when type, year range, or query changes
    */
   useEffect(() => {
-    //Only Triggers the search if the query is not empty
     if (query.trim()) {
       onSearch();
     }
-  }, [type, yearRange, query, onSearch]); // Dependencies: type and year range filters 
+  }, [type, yearRange, query, onSearch]);
 
   /**
-   * Handler for type filter changes
-   * Updates the type and maintains the controlled component pattern
+   * Updates the type filter and maintains the controlled component pattern
+   * @param newType - New type selected (movie, series, episode, or empty)
    */
   const handleTypeChange = useCallback((newType: typeof type) => {
     setType(newType);
   }, [setType]);
 
   /**
-   * Handler for search execution
-   * Prevents search when loading or query is empty
+   * Executes search when the query is valid and not loading
    */
   const handleSearch = useCallback(() => {
     if (!loading && query.trim()) {
@@ -73,20 +70,19 @@ const SearchBar: FC<SearchBarProps> = ({
   }, [loading, query, onSearch]);
 
   /**
-   * Handler for query input change
-   * Allows setting query with debounce prevention
+   * Handles input change for the search query
+   * @param e - Event from input change
    */
   const handleQueryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   }, [setQuery]);
 
   /**
-   * Handler for key press event in search input
-   * Triggers search on Enter key
+   * Handles the Enter key press event to execute a search
+   * @param e - Key press event from the input
    */
   const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      // Execute search on enter button
       handleSearch();
     }
   }, [handleSearch]);
@@ -94,15 +90,17 @@ const SearchBar: FC<SearchBarProps> = ({
   return (
     <Stack spacing={1}>
       {/* Main Search Container */}
-      <Box sx={{
-        backgroundColor: '#727272',
-        borderRadius: 1,
-        p: 2,
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2
-      }}>
+      <Box
+        sx={{
+          backgroundColor: '#727272',
+          borderRadius: 1,
+          p: 2,
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}
+      >
         {/* Input field for searching movies */}
         <Box sx={{ display: 'flex', alignItems: 'center', width: '40%' }}>
           <TextField
@@ -115,11 +113,11 @@ const SearchBar: FC<SearchBarProps> = ({
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <IconButton 
-                    onClick={handleSearch} //Execute search onclick of search icon
+                  <IconButton
+                    onClick={handleSearch}
                     disabled={loading}
                     size="small"
-                    sx={{ 
+                    sx={{
                       color: 'white',
                       '&:hover': {
                         backgroundColor: 'rgba(255, 255, 255, 0.1)'
@@ -131,25 +129,25 @@ const SearchBar: FC<SearchBarProps> = ({
                   </IconButton>
                 </InputAdornment>
               ),
-              disableUnderline: true, // Disabled underline for borderless effect
+              disableUnderline: true
             }}
             sx={{
               input: {
-                color: 'white', // Input text color
-                padding: '20px 0', // Adjust padding for vertical centering
+                color: 'white',
+                padding: '20px 0'
               },
               '& .MuiInputBase-root': {
                 display: 'flex',
-                alignItems: 'center', // Vertically center icon and text
-                backgroundColor: 'transparent', // Set transparent background
+                alignItems: 'center',
+                backgroundColor: 'transparent'
               },
               '& .MuiInputBase-input::placeholder': {
-                color: 'white', // Placeholder text color
-                opacity: 1, // Ensure full opacity
+                color: 'white',
+                opacity: 1
               },
               '& .MuiInputAdornment-root': {
-                marginTop: '0', // To prevent misalignment
-              },
+                marginTop: '0'
+              }
             }}
           />
         </Box>
