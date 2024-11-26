@@ -1,17 +1,22 @@
-# OMDB Movie Search React App
+# OMDB Movie Search React App (public/hms-cover.png)
 
 This is a React application that allows users to search for movies, series, and episodes from the OMDb API, view detailed information, and add them to a watchlist. The app includes features like year range filtering and type filtering for more specific search results.
 
 ## Features
 
-- **Movie Search**: Search for movies, series, episodes, or any other type by title, displaying results with details like title, year, and poster.
-- **Watchlist**: Users can add movies to their personal watchlist.
+- **Movie Search**: Search for movies, series, episodes, or any other type by title.
 - **Year Range Filter**: Filter search results by year range (from 1970 to 2024).
 - **Type Filter**: Filter search results by type (Movies, Series, Episodes, or Any).
+- **Movie Details**: Display detailed information about each movie, including title, year, poster, plot, and the option to add it to the watchlist.
+- **Watchlist**: Users can add movies to their personal watchlist.
 
 ## Limitations
 
 - **Not Responsive**: The app is currently not designed to be responsive for mobile or tablet devices, as a mock-up is not provided. However, this can be implemented as an enhancement in the future.
+
+# Getting Started with Create React App
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Installation
 
