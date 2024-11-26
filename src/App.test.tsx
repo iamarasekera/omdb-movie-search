@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import App from './App';
 import { fetchMovies, fetchMovieDetails } from '../src/api/movieApi';
 import {MovieDetail, SearchResponse } from '../src/types'; // Import from existing types
+import MovieList from "./components/MovieList";
 
 /**
  * Mock implementation of IntersectionObserver for testing environments
@@ -123,5 +124,38 @@ describe('App Component', () => {
       interval: 100 
     });
   });
+
+    /**
+   * Test case: Verify movie selection functionality
+   * - Checks if clicking a movie triggers the selection callback
+   */
+    test("selects movie and shows details", async () => {
+      // Create a mock function to simulate movie selection
+      const mockOnSelectMovie = jest.fn();
+  
+      // Predefined test movie data
+      const movies = [
+          {
+              imdbID: "1",
+              Title: "Test Movie Title",
+              Year: "2021",
+              Type: "movie",
+              Poster: "https://via.placeholder.com/150"
+          }
+      ];
+  
+      // Render MovieList with test data
+      render(<MovieList movies={movies} onSelectMovie={mockOnSelectMovie} />);
+  
+      // Find and verify movie title is rendered
+      const movieTitle = await screen.findByText(/Test Movie Title/i);
+      expect(movieTitle).toBeInTheDocument();
+  
+      // Simulate clicking the movie
+      fireEvent.click(movieTitle);
+  
+      // Verify the selection callback is called with correct movie data
+      expect(mockOnSelectMovie).toHaveBeenCalledWith(movies[0]);
+    });
 
 });
