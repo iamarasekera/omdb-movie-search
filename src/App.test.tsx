@@ -213,5 +213,32 @@ describe('App Component', () => {
         expect(fetchMovies).toHaveBeenCalledWith('Test', 1, 'movie');
       });
     });
+  /**
+   * Test case: Verify handling of no search results
+   * - Checks error handling when no movies are found
+   */
+  test('handles search with no results', async () => {
+    // Mock API response for no results
+    (fetchMovies as jest.Mock).mockResolvedValue({
+      Response: 'False',
+      Error: 'Movie not found!'
+    });
+  
+    // Render App component
+    render(<App />);
+    
+    // Perform search with non-existent movie
+    const searchInput = screen.getByPlaceholderText('Search Movies');
+    const searchButton = screen.getByLabelText('Search movies');
+    fireEvent.change(searchInput, { target: { value: 'NonexistentMovie' } });
+    fireEvent.click(searchButton);
+  
+    // Wait for and verify error message
+    await waitFor(() => {
+      // Flexible query to match various no results messages
+      const errorElement = screen.queryByText(/no results|movie not found/i);
+      expect(errorElement).toBeInTheDocument();
+    });
+  });
 
 });
