@@ -39,7 +39,7 @@ const MovieList: FC<MovieListProps> = ({
     // Create refs for intersection observer
     const observerRef = useRef<IntersectionObserver>();
     const loadingRef = useRef<HTMLDivElement>(null);
-    
+
     // Add state to track selected movie
     const [selectedMovieId, setSelectedMovieId] = useState<string>('');
 
@@ -102,7 +102,14 @@ const MovieList: FC<MovieListProps> = ({
             }}
         >
             {/* Display total number of results */}
-            <Typography variant="h6" gutterBottom>
+            <Typography gutterBottom sx={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 1,
+                backgroundColor: 'white',
+                padding: '10px',
+                boxShadow: '0px 1px 3px rgba(0,0,0,0.1)',
+            }}>
                 {totalResults ? `${totalResults} Results` : `${movies.length} Results`}
             </Typography>
             {/* Render list of movies */}
@@ -110,7 +117,7 @@ const MovieList: FC<MovieListProps> = ({
                 {movies.map((movie) => (
                     <React.Fragment key={movie.imdbID}>
                         <ListItem disablePadding>
-                            <ListItemButton 
+                            <ListItemButton
                                 onClick={() => handleMovieSelect(movie)}
                                 onKeyPress={(e) => handleKeyPress(e, movie)}
                                 tabIndex={0}
