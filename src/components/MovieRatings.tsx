@@ -1,19 +1,24 @@
 /**
  * MovieRatings Component
- * This component displays movie ratings from IMDb, Rotten Tomatoes & Metacritic
+ * Displays movie ratings from IMDb, Rotten Tomatoes, and Metacritic
  */
+
 import React from 'react';
 import { Box, Typography, Divider, Theme } from '@mui/material';
-import { MovieDetail } from '../types';  // Remove Rating from import since we're not using it directly
+import { MovieDetail } from '../types'; // Import for movie detail type
 import { SxProps } from '@mui/system';
 
-// Props interface for the main component
+/**
+ * Props interface for the main MovieRatings component
+ */
 interface MovieRatingsProps {
   movie: MovieDetail;
   sx?: SxProps<Theme>;
 }
 
-// Props for the individual rating display sections
+/**
+ * Props for individual rating display sections
+ */
 interface RatingSectionProps {
   source: string;
   rating: string;
@@ -21,7 +26,14 @@ interface RatingSectionProps {
   sx?: SxProps<Theme>;
 }
 
-// Component for displaying individual rating sections
+/**
+ * Displays an individual rating section
+ * @param source The name of the rating source (e.g., IMDb, Rotten Tomatoes)
+ * @param rating The numerical rating value
+ * @param outOf The scale of the rating (e.g., /10, /100)
+ * @param sx Optional custom styles
+ * @returns JSX Element for a single rating section
+ */
 const RatingSection: React.FC<RatingSectionProps> = ({ source, rating, outOf }) => (
   <Box 
     sx={{ 
@@ -65,9 +77,18 @@ const RatingSection: React.FC<RatingSectionProps> = ({ source, rating, outOf }) 
   </Box>
 );
 
-// Main MovieRatings component
+/**
+ * Displays ratings for a given movie
+ * @param movie Movie details including ratings from different sources
+ * @param sx Optional custom styles
+ * @returns JSX Element for the ratings component
+ */
 const MovieRatings: React.FC<MovieRatingsProps> = ({ movie, sx }) => {
-  // Helper function to get rating by source
+  /**
+   * Fetches a specific rating from the movie data by source
+   * @param source The name of the rating source
+   * @returns The rating value or 'N/A' if not found
+   */
   const getRatingBySource = (source: string): string => {
     const rating = movie.Ratings?.find((r) => r.Source === source);
     return rating?.Value || 'N/A';
@@ -83,7 +104,7 @@ const MovieRatings: React.FC<MovieRatingsProps> = ({ movie, sx }) => {
     {
       source: 'Rotten Tomatoes',
       rating: getRatingBySource('Rotten Tomatoes'),
-      outOf: ''  // No outOf needed as RT includes % in rating
+      outOf: '' // No outOf needed as Rotten Tomatoes includes % in the rating
     },
     {
       source: 'Metacritic',
