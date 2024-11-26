@@ -2,7 +2,7 @@
  * SearchBar Component
  * This component provides search functionality for movies, series, or episodes
  */
-import React, { FC, useEffect, useCallback, memo } from 'react';
+import React, { FC, useEffect, useCallback, memo, useState } from 'react';
 import {
   Box,
   TextField,
@@ -14,7 +14,8 @@ import {
   FormControl,
   Stack,
   FormLabel,
-  IconButton
+  IconButton,
+  FormHelperText
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import YearRangeSlider from './YearRangeSlide';
@@ -42,6 +43,9 @@ const SearchBar: FC<SearchBarProps> = ({
   type,
   setType
 }) => {
+  // State to manage search input validation error
+  const [error, setError] = useState<string>('');
+
   /**
    * Effect hook to trigger search when filters change
    * Automatically updates results when type, year range, or query changes
@@ -49,6 +53,7 @@ const SearchBar: FC<SearchBarProps> = ({
   useEffect(() => {
     if (query.trim()) {
       onSearch();
+      setError(''); // Clear any previous errors
     }
   }, [type, yearRange, query, onSearch]);
 
@@ -62,20 +67,34 @@ const SearchBar: FC<SearchBarProps> = ({
 
   /**
    * Executes search when the query is valid and not loading
+   * Validates search input and sets error message if empty
    */
   const handleSearch = useCallback(() => {
-    if (!loading && query.trim()) {
+    // Validate search input
+    if (!query.trim()) {
+      setError('Please enter a search term');
+      return;
+    }
+
+    // Clear any previous errors and execute search
+    setError('');
+    if (!loading) {
       onSearch();
     }
   }, [loading, query, onSearch]);
 
   /**
    * Handles input change for the search query
+   * Clears error when user starts typing
    * @param e - Event from input change
    */
   const handleQueryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    // Clear error when user starts typing
+    if (error) {
+      setError('');
+    }
     setQuery(e.target.value);
-  }, [setQuery]);
+  }, [setQuery, error]);
 
   /**
    * Handles the Enter key press event to execute a search
@@ -102,7 +121,7 @@ const SearchBar: FC<SearchBarProps> = ({
         }}
       >
         {/* Input field for searching movies */}
-        <Box sx={{ display: 'flex', alignItems: 'center', width: '40%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', width: '40%' }}>
           <TextField
             placeholder="Search Movies"
             variant="standard"
@@ -110,6 +129,7 @@ const SearchBar: FC<SearchBarProps> = ({
             value={query}
             onChange={handleQueryChange}
             onKeyPress={handleKeyPress}
+            error={!!error}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -150,6 +170,19 @@ const SearchBar: FC<SearchBarProps> = ({
               }
             }}
           />
+          {/* Display error message if validation fails */}
+          {error && (
+            <FormHelperText 
+              error 
+              sx={{ 
+                color: 'red', 
+                marginLeft: 0, 
+                marginTop: '4px' 
+              }}
+            >
+              {error}
+            </FormHelperText>
+          )}
         </Box>
 
         {/* Year Range Slider */}
