@@ -1,6 +1,6 @@
 /**
  * YearRange Component
- * This component that displays a selectable range of years from 1970 to 2024.
+ * This component displays a selectable range of years from 1970 to 2024.
  * It allows the user to select a range of years using a slider.
  */
 
@@ -21,6 +21,14 @@ interface YearRangeSliderProps {
     onYearRangeChange: (range: YearRange) => void; // Callback function to handle year range change
 }
 
+/**
+ * YearRangeSlider Component
+ * This component renders a slider for selecting a year range.
+ * It provides a visual slider between 1970 and 2024 for the user to choose a range.
+ * 
+ * @param yearRange The current selected year range (startYear and endYear)
+ * @param onYearRangeChange Callback function to update the parent component with the new year range
+ */
 const YearRangeSlider: React.FC<YearRangeSliderProps> = ({
     yearRange,
     onYearRangeChange
@@ -30,7 +38,11 @@ const YearRangeSlider: React.FC<YearRangeSliderProps> = ({
     const MAX_YEAR = 2024;
     const STEP = 1; // Step interval for the slider
 
-    // Handle slider value change
+    /**
+     * Handle the change in slider values
+     * @param event The change event from the slider
+     * @param newValue The new value selected in the slider
+     */
     const handleChange = (event: Event, newValue: number | number[]) => {
         // Get the start and end years from the new value
         const [startYear, endYear] = newValue as number[];

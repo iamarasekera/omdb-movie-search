@@ -1,14 +1,14 @@
 /**
  * WatchList Component
- * This componentm manages user's saved or watched movies
-*/
-import React, { FC }  from 'react';
+ * This component manages user's saved or watched movies
+ */
+import React, { FC } from 'react';
 import { Paper, Typography, List, ListItem, ListItemText, ListItemAvatar, Avatar } from '@mui/material';
 import { Movie } from '../types';
 
 // Define the types for the props WatchList component will receive
 interface WatchListProps {
-  watchlist: Movie[];
+  watchlist: Movie[]; // List of movies in the user's watchlist
 }
 
 // Functional component for the WatchList
@@ -19,14 +19,15 @@ const WatchList: FC<WatchListProps> = ({ watchlist }) => {
       <Typography variant="h6" gutterBottom>
         My Watchlist ({watchlist.length})
       </Typography>
+
       {/* Check if the watchlist is empty */}
       {watchlist.length === 0 ? (
-        //If the watchlist is empty display "WatchList is empty" 
+        // If the watchlist is empty display "WatchList is empty"
         <Typography variant="body2" color="textSecondary">
           Your watchlist is empty. Add movies to your watchlist to see them here.
         </Typography>
       ) : (
-        /*Display the list of movies in the watchlist */
+        /* Display the list of movies in the watchlist */
         <List sx={{ maxHeight: 300, overflow: 'auto' }}>
           {watchlist.map((movie) => (
             <ListItem key={movie.imdbID}>
