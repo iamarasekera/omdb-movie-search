@@ -2,7 +2,7 @@
  * SearchBar Component
  * This component provides search functionality for movies
 */
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useCallback, memo } from 'react';
 import {
   Box,
   TextField,
@@ -52,25 +52,44 @@ const SearchBar: FC<SearchBarProps> = ({
     if (query.trim()) {
       onSearch();
     }
-  }, [type, yearRange]); // Dependencies: type and year range filters 
+  }, [type, yearRange, query, onSearch]); // Dependencies: type and year range filters 
 
   /**
    * Handler for type filter changes
    * Updates the type and maintains the controlled component pattern
    */
-  const handleTypeChange = (newType: typeof type) => {
+  const handleTypeChange = useCallback((newType: typeof type) => {
     setType(newType);
-  };
+  }, [setType]);
 
   /**
    * Handler for search execution
    * Prevents search when loading or query is empty
    */
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     if (!loading && query.trim()) {
       onSearch();
     }
-  };
+  }, [loading, query, onSearch]);
+
+  /**
+   * Handler for query input change
+   * Allows setting query with debounce prevention
+   */
+  const handleQueryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  }, [setQuery]);
+
+  /**
+   * Handler for key press event in search input
+   * Triggers search on Enter key
+   */
+  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // Execute search on enter button
+      handleSearch();
+    }
+  }, [handleSearch]);
 
   return (
     <Stack spacing={1}>
@@ -91,13 +110,8 @@ const SearchBar: FC<SearchBarProps> = ({
             variant="standard"
             fullWidth
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                // Execute search on enter button
-                handleSearch();
-              }
-            }}
+            onChange={handleQueryChange}
+            onKeyPress={handleKeyPress}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -146,7 +160,7 @@ const SearchBar: FC<SearchBarProps> = ({
           onYearRangeChange={setYearRange}
         />
 
-        {/* Radion Button Group for type selection */}
+        {/* Radio Button Group for type selection */}
         <FormControl component="fieldset">
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <FormLabel
@@ -237,4 +251,4 @@ const SearchBar: FC<SearchBarProps> = ({
   );
 };
 
-export default SearchBar;
+export default memo(SearchBar);
