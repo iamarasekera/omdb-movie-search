@@ -222,6 +222,15 @@ const App: React.FC = () => {
   // Constant to determine if there are more results to load
   const hasMore = movies.length < totalResults;
 
+  // Effect to clear movies when query is empty
+  React.useEffect(() => {
+    if (query.trim() === '') {
+      setMovies([]);
+      setTotalResults(0);
+      setSelectedMovie(null);
+    }
+  }, [query]);
+
   return (
     <Container>
       {/* SearchBar component */}
