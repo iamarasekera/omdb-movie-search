@@ -5,6 +5,7 @@ import App from './App';
 import { fetchMovies, fetchMovieDetails } from '../src/api/movieApi';
 import {MovieDetail, SearchResponse } from '../src/types'; // Import from existing types
 import MovieList from "./components/MovieList";
+import MovieDetails from "./components/MovieDetails";
 
 /**
  * Mock implementation of IntersectionObserver for testing environments
@@ -157,5 +158,34 @@ describe('App Component', () => {
       // Verify the selection callback is called with correct movie data
       expect(mockOnSelectMovie).toHaveBeenCalledWith(movies[0]);
     });
+
+  /**
+   * Test case: Verify add to watchlist functionality
+   * - Checks if clicking watchlist button calls the correct method
+   */
+  test('adds movie to watchlist', async () => {
+    // Mock API responses
+    (fetchMovies as jest.Mock).mockResolvedValue(mockSearchResponse);
+    (fetchMovieDetails as jest.Mock).mockResolvedValue(mockMovieDetails);
+
+    // Create a mock function for adding to watchlist
+    const mockAddToWatchlist = jest.fn();
+
+    // Render MovieDetails component with mock functions
+    render(
+      <MovieDetails 
+        movie={mockMovieDetails} 
+        addToWatchlist={mockAddToWatchlist} 
+        isInWatchlist={() => false}  // Mock isInWatchlist function
+      />
+    );
+
+    // Find and click watchlist button
+    const watchlistButton = screen.getByRole('button', { name: /watchlist/i });
+    fireEvent.click(watchlistButton);
+
+    // Verify addToWatchlist was called with correct movie details
+    expect(mockAddToWatchlist).toHaveBeenCalledWith(mockMovieDetails);
+  });
 
 });
