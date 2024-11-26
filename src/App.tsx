@@ -22,10 +22,16 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+
   // State management for dialog
   const [watchlistOpen, setWatchlistOpen] = useState(false);
 
-  // Memoized year range filtering function
+  /**
+   * Filters movies based on the year range
+   * @param movies Array of movies to filter
+   * @param allResults Total number of API results
+   * @returns Filtered movies and adjusted total results
+   */
   const filterMoviesByYearRange = useCallback((movies: Movie[], allResults: number) => {
     const filteredMovies = movies.filter(movie => {
       // Handle movies with year ranges (eg: 2020-2022)
@@ -58,7 +64,10 @@ const App: React.FC = () => {
     return { filteredMovies, filteredTotal: estimatedTotal };
   }, [yearRange]);
 
-  // Async (Memoized) function to search movies via OMDb API 
+  /**
+   * Searches for movies via OMDb API
+   * @param page Page number for pagination
+   */
   const searchMovies = useCallback(async (page: number = 1) => {
     if (!query.trim()) {
       setMovies([]);
@@ -85,7 +94,7 @@ const App: React.FC = () => {
         setMovies(prevMovies =>
           page === 1 ? filteredMovies : [...prevMovies, ...filteredMovies]
         );
-  // Update total results with filtered count
+        // Update total results with filtered count
         setTotalResults(filteredTotal);
 
         // Display error only if no movies match the filter AND user is on the first page
@@ -95,7 +104,7 @@ const App: React.FC = () => {
           setError(null);
         }
       } else {
-         // Handle no results scenario
+        // Handle no results scenario
         setError(response.Error || 'No results found');
         setMovies([]);
         setTotalResults(0);
@@ -111,7 +120,10 @@ const App: React.FC = () => {
     }
   }, [query, type, yearRange, filterMoviesByYearRange]);
 
-  // Function (Memoized) to fetches movie details
+  /**
+   * Fetches movie details based on IMDb ID
+   * @param movie Selected movie object
+   */
   const handleSelectMovie = useCallback(async (movie: Movie) => {
     try {
       const details = await fetchMovieDetails(movie.imdbID);
@@ -121,13 +133,18 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Search and pagination handlers
+  /**
+   * Initiates a new search
+   */
   const onSearch = useCallback(() => {
     setCurrentPage(1);
     setSelectedMovie(null);
     searchMovies(1);
   }, [searchMovies]);
-  // Load more results for pagination
+
+  /**
+   * Loads additional movies for pagination
+   */
   const loadMore = useCallback(() => {
     if (!loading && movies.length < totalResults) {
       const nextPage = currentPage + 1;
@@ -136,12 +153,19 @@ const App: React.FC = () => {
     }
   }, [loading, movies.length, totalResults, currentPage, searchMovies]);
 
-  // Function to check if a movie is in the watchlist
+  /**
+   * Checks if a movie is in the watchlist
+   * @param movieId IMDb ID of the movie
+   * @returns Boolean indicating presence in watchlist
+   */
   const isInWatchlist = useCallback((movieId: string): boolean => {
     return watchlist.some(movie => movie.imdbID === movieId);
   }, [watchlist]);
 
-  // Adds or removes the selected movie to the watchlist 
+  /**
+   * Adds or removes a movie from the watchlist
+   * @param movie Movie details object
+   */
   const addToWatchlist = useCallback((movie: MovieDetail) => {
     setWatchlist(prevWatchlist => {
       const isAlreadyInWatchlist = prevWatchlist.some(
@@ -149,13 +173,14 @@ const App: React.FC = () => {
       );
 
       return isAlreadyInWatchlist
-      // Remove from watchlist if already present 
         ? prevWatchlist.filter(item => item.imdbID !== movie.imdbID)
-       // Add to watchlist if not present  
         : [...prevWatchlist, movie];
     });
   }, []);
-  // Function to handle closing of the watchlist
+
+  /**
+   * Handles closing of the watchlist dialog
+   */
   const handleCloseWatchlist = useCallback(() => {
     // Set the watchlist state to false when watchlist UI closes
     setWatchlistOpen(false);
@@ -214,7 +239,7 @@ const App: React.FC = () => {
           {error}
         </Alert>
       )}
-      {    /* MovieList component */}
+      {/* MovieList component */}
       <Grid container spacing={3}>
         <Grid item xs={4}>
           <MovieList
@@ -225,8 +250,7 @@ const App: React.FC = () => {
             hasMore={hasMore}
             loading={loading}
           />
-
-          {    /* MovieDetails component */}
+          {/* MovieDetails component */}
         </Grid>
         <Grid item xs={8}>
           <MovieDetails
