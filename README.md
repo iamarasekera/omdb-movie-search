@@ -83,13 +83,40 @@ If you're not satisfied with the build tool or configuration, you can eject at a
 This project requires the following dependencies:
 
 - **React**: A JavaScript library for building user interfaces.
-- **Material-UI**: A popular React UI framework for building responsive, modern web applications.
-- **Axios**: For making HTTP requests to the OMDb API.
+```bash
+npm install react react-dom
+```
 
-To install these dependencies, run:
+- **Material-UI**: A popular React UI framework for building responsive, modern web applications.
+```bash
+npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
+```
+
+- **Axios**: For making HTTP requests to the OMDb API.
+```bash
+npm install axios
+```
+
+### Installation
+
+To install all dependencies at once, run:
+
+```bash
+npm install react react-dom @mui/material @emotion/react @emotion/styled @mui/icons-material axios
+```
+
+### Troubleshooting Installation
+
+If the comprehensive `npm install` command fails, run the following individual commands:
 
 ```bash
 npm install
+```
+### Verify Installation
+
+After installation, you can verify the packages by checking your `package.json` file or running:
+```bash
+npm list react @mui/material axios
 ```
 
 ## Development Dependencies
