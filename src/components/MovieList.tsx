@@ -1,7 +1,7 @@
 /**
  * MovieList Component
  * This component renders a list of movies with infinite scroll functionality.
-*/
+ */
 import React, { FC, useRef, useEffect, useState, KeyboardEvent } from 'react';
 import {
     Box,
@@ -17,7 +17,9 @@ import {
 } from '@mui/material';
 import { Movie } from '../types';
 
-// Define the types for the props MovieListProps component will receive
+/**
+ * Props for the MovieList component
+ */
 interface MovieListProps {
     movies: Movie[];
     onSelectMovie: (movie: Movie) => void;
@@ -40,7 +42,7 @@ const MovieList: FC<MovieListProps> = ({
     const observerRef = useRef<IntersectionObserver>();
     const loadingRef = useRef<HTMLDivElement>(null);
 
-    // Add state to track selected movie
+    // State for managing selected movie ID
     const [selectedMovieId, setSelectedMovieId] = useState<string>('');
 
     useEffect(() => {
@@ -68,13 +70,20 @@ const MovieList: FC<MovieListProps> = ({
         };
     }, [hasMore, loading, onLoadMore]);
 
-    // Handle movie selection
+    /**
+     * Handles movie selection
+     * @param movie Selected movie object
+     */
     const handleMovieSelect = (movie: Movie) => {
         setSelectedMovieId(movie.imdbID);
         onSelectMovie(movie);
     };
 
-    // Handle keyboard events
+    /**
+     * Handles keyboard interaction for accessibility
+     * @param event Keyboard event object
+     * @param movie Movie object to be selected
+     */
     const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>, movie: Movie) => {
         if (event.key === 'Enter') {
             handleMovieSelect(movie);
@@ -86,32 +95,30 @@ const MovieList: FC<MovieListProps> = ({
             sx={{
                 height: '80vh',
                 overflow: 'auto',
-                '&::-webkit-scrollbar': {
-                    width: '8px',
-                },
-                '&::-webkit-scrollbar-track': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                },
+                '&::-webkit-scrollbar': { width: '8px' },
+                '&::-webkit-scrollbar-track': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
                 '&::-webkit-scrollbar-thumb': {
                     backgroundColor: 'rgba(0, 0, 0, 0.2)',
                     borderRadius: '4px',
-                    '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                    },
+                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.3)' },
                 },
             }}
         >
             {/* Display total number of results */}
-            <Typography gutterBottom sx={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 1,
-                backgroundColor: 'white',
-                padding: '10px',
-                boxShadow: '0px 1px 3px rgba(0,0,0,0.1)',
-            }}>
+            <Typography
+                gutterBottom
+                sx={{
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1,
+                    backgroundColor: 'white',
+                    padding: '10px',
+                    boxShadow: '0px 1px 3px rgba(0,0,0,0.1)',
+                }}
+            >
                 {totalResults ? `${totalResults} Results` : `${movies.length} Results`}
             </Typography>
+
             {/* Render list of movies */}
             <List>
                 {movies.map((movie) => (
@@ -124,8 +131,9 @@ const MovieList: FC<MovieListProps> = ({
                                 sx={{
                                     backgroundColor: selectedMovieId === movie.imdbID ? '#00000033' : 'transparent',
                                     '&:hover': {
-                                        backgroundColor: selectedMovieId === movie.imdbID ? '#00000033' : 'transparent',
-                                    }
+                                        backgroundColor:
+                                            selectedMovieId === movie.imdbID ? '#00000033' : 'transparent',
+                                    },
                                 }}
                             >
                                 {/* Movie poster avatar */}
@@ -144,13 +152,14 @@ const MovieList: FC<MovieListProps> = ({
                     </React.Fragment>
                 ))}
             </List>
+
             {/* Loading indicator that triggers infinite scroll */}
             <Box
                 ref={loadingRef}
                 sx={{
                     display: 'flex',
                     justifyContent: 'center',
-                    py: 2
+                    py: 2,
                 }}
             >
                 {loading && <CircularProgress size={24} />}
