@@ -84,7 +84,6 @@ This project requires the following dependencies:
 
 - **React**: A JavaScript library for building user interfaces.
 - **Material-UI**: A popular React UI framework for building responsive, modern web applications.
-- **React Router**: For navigating between different pages (if implemented).
 - **Axios**: For making HTTP requests to the OMDb API.
 
 To install these dependencies, run:
