@@ -12,6 +12,10 @@ const BASE_URL = 'https://www.omdbapi.com/';
 
 /**
  * Fetches a list of movies based on the search query, page number, and optional type filter.
+ * @param query The search query for the movies.
+ * @param page The page number of the search results (defaults to 1).
+ * @param type Optional type filter for the movie (can be 'movie', 'series', 'episode', or '').
+ * @returns A promise that resolves to the search response containing movie data.
  */
 export const fetchMovies = async (
   query: string, 
@@ -40,6 +44,8 @@ export const fetchMovies = async (
 
 /**
  * Fetches detailed information about a specific movie by IMDb ID.
+ * @param imdbID The IMDb ID of the movie to fetch details for.
+ * @returns A promise that resolves to the movie details.
  */
 export const fetchMovieDetails = async (imdbID: string): Promise<MovieDetail> => {
   // Construct the API endpoint URL for fetching movie details.
