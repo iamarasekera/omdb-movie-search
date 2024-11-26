@@ -187,5 +187,31 @@ describe('App Component', () => {
     // Verify addToWatchlist was called with correct movie details
     expect(mockAddToWatchlist).toHaveBeenCalledWith(mockMovieDetails);
   });
+    /**
+   * Test case: Verify movie type filtering
+   * - Checks if selecting a movie type filters search results
+   */
+    test('filters movies by type', async () => {
+      // Mock API response
+      (fetchMovies as jest.Mock).mockResolvedValue(mockSearchResponse);
+  
+      // Render App component
+      render(<App />);
+      
+      // Select 'Movies' type filter
+      const moviesRadio = screen.getByLabelText('Movies');
+      fireEvent.click(moviesRadio);
+  
+      // Perform search
+      const searchInput = screen.getByPlaceholderText('Search Movies');
+      const searchButton = screen.getByLabelText('Search movies');
+      fireEvent.change(searchInput, { target: { value: 'Test' } });
+      fireEvent.click(searchButton);
+  
+      // Verify API call includes movie type filter
+      await waitFor(() => {
+        expect(fetchMovies).toHaveBeenCalledWith('Test', 1, 'movie');
+      });
+    });
 
 });
