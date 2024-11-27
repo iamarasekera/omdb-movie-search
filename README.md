@@ -22,7 +22,7 @@ This is a React application that allows users to search for movies, series, and 
 Clone the repository to your local machine:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/iamarasekera/omdb-movie-search.git
 cd omdb-movie-search
 ```
 
@@ -41,12 +41,12 @@ This will install all required libraries for the project.
 Create a `.env` file in the root directory of your project. You'll need to set your OMDb API key in the `.env` file:
 
 ```env
-REACT_APP_OMDB_API_KEY=your-api-key-here
+REACT_APP_OMDB_API_KEY='your-api-key-here'
 ```
 
 Replace `your-api-key-here` with your actual OMDb API key, which you can obtain by signing up at [OMDb API](http://www.omdbapi.com/).
 
-## 4. Run the Application
+### 4. Run the Application
 
 To start the application, use the following command:
 
