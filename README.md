@@ -127,11 +127,12 @@ For unit testing, the following packages were installed:
 - **@testing-library/jest-dom**: Custom matchers for Jest, to make it easier to test DOM nodes.
 - **@testing-library/user-event**: For simulating user events in tests.
 - **@types/jest**: TypeScript definitions for Jest.
+- **@types/react**: TypeScript definitions for React.
 
 To install these development dependencies, run:
 
 ```bash
-npm install --save-dev @testing-library/react @testing-library/jest-dom @testing-library/user-event @types/jest
+npm install --save-dev @testing-library/react @testing-library/jest-dom @testing-library/user-event @types/jest @types/react
 ```
 
 ## Running Unit Tests
