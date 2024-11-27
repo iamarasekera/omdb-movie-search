@@ -46,7 +46,7 @@ REACT_APP_OMDB_API_KEY=your-api-key-here
 
 Replace `your-api-key-here` with your actual OMDb API key, which you can obtain by signing up at [OMDb API](http://www.omdbapi.com/).
 
-## Running the Application
+## 4. Run the Application
 
 To start the application, use the following command:
 
