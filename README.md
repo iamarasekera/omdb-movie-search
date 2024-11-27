@@ -15,11 +15,7 @@ This is a React application that allows users to search for movies, series, and 
 
 - **Not Responsive**: The app is currently not designed to be responsive for mobile or tablet devices, as a mock-up is not provided. However, this can be implemented as an enhancement in the future.
 
-# Getting Started
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Installation
+## Getting Started
 
 ### 1. Clone the Repository
 
@@ -49,6 +45,15 @@ REACT_APP_OMDB_API_KEY=your-api-key-here
 ```
 
 Replace `your-api-key-here` with your actual OMDb API key, which you can obtain by signing up at [OMDb API](http://www.omdbapi.com/).
+
+## Running the Application
+
+To start the application, use the following command:
+
+```bash
+npm start
+```
+This will start the development server and launch the application. By default, the app will be available at http://localhost:3000 in your browser. The server will automatically reload whenever changes are made to the source files.
 
 ## Available Scripts
 
