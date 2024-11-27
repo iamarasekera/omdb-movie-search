@@ -15,7 +15,7 @@ This is a React application that allows users to search for movies, series, and 
 
 - **Not Responsive**: The app is currently not designed to be responsive for mobile or tablet devices, as a mock-up is not provided. However, this can be implemented as an enhancement in the future.
 
-# Getting Started with Create React App
+# Getting Started
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -107,11 +107,8 @@ npm install react react-dom @mui/material @emotion/react @emotion/styled @mui/ic
 
 ### Troubleshooting Installation
 
-If the comprehensive `npm install` command fails, run the following individual commands:
+If the comprehensive `npm install` command fails, run the individual commands above to install the dependencies.
 
-```bash
-npm install
-```
 ### Verify Installation
 
 After installation, you can verify the packages by checking your `package.json` file or running:
